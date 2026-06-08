@@ -107,17 +107,18 @@ const mergePayloadIntoResume = (payload: IGeminiResumePayload): Resume => {
       countryCode: ensureCountryCode(basics.location.countryCode),
     };
   }
-  resume.basics.profiles = (basics.profiles ?? [])
-    .map((p) => {
-      const url = sanitizeUrl(p.url);
-      if (!url) return null;
-      return {
-        network: (p.network ?? '').trim(),
-        username: p.username?.trim() || undefined,
-        url,
-      };
-    })
-    .filter((p): p is { network: string; username?: string; url: string } => p !== null);
+  const profilesList: { network: string; url: string; username?: string }[] = [];
+  for (const p of basics.profiles ?? []) {
+    const url = sanitizeUrl(p.url);
+    if (!url) continue;
+    const username = p.username?.trim();
+    profilesList.push({
+      network: (p.network ?? '').trim(),
+      url,
+      ...(username ? { username } : {}),
+    });
+  }
+  resume.basics.profiles = profilesList;
 
   const fallbackYear = String(new Date().getFullYear());
   resume.work = (payload.work ?? []).map((w) => ({
