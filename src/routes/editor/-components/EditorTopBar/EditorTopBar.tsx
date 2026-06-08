@@ -63,17 +63,20 @@ const EditorTopBar: FC<IEditorTopBarProps> = ({ onDownload, downloading = false 
         )}
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4">
         <AutosaveIndicator />
         <ThemeToggle />
         <button
           type="button"
           onClick={onDownload}
           disabled={downloading}
-          className="inline-flex h-9 items-center gap-2 rounded-sm bg-ink px-3.5 text-sm font-medium text-bg shadow-1 transition-[background-color,transform] duration-fast ease-out-quart hover:bg-accent active:translate-y-px focus-visible:outline-none disabled:opacity-50"
+          aria-label={downloading ? 'Generating PDF' : 'Download PDF'}
+          className="inline-flex h-9 items-center gap-2 rounded-sm bg-ink px-3 sm:px-3.5 text-sm font-medium text-bg shadow-1 transition-[background-color,transform] duration-fast ease-out-quart hover:bg-accent active:translate-y-px focus-visible:outline-none disabled:opacity-50"
         >
           <HugeiconsIcon icon={Download04Icon} size={16} strokeWidth={1.5} />
-          {downloading ? 'Generating…' : 'Download PDF'}
+          <span className="hidden sm:inline">
+            {downloading ? 'Generating…' : 'Download PDF'}
+          </span>
         </button>
       </div>
     </header>

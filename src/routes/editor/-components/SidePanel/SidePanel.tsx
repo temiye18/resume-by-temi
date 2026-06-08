@@ -7,10 +7,7 @@ import {
   Download04Icon,
 } from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/cn';
-import SectionsTab from '../SectionsTab/SectionsTab';
-import TemplateTab from '../TemplateTab/TemplateTab';
-import ThemeTab from '../ThemeTab/ThemeTab';
-import ExportTab from '../ExportTab/ExportTab';
+import EditorTabContent from '../EditorTabContent/EditorTabContent';
 import type { EditorTab } from '@/types/editor-tab-type';
 import type { IconSvgElement } from '@hugeicons/react';
 
@@ -29,7 +26,7 @@ interface ISidePanelProps {
 }
 
 interface ITabConfig {
-  value: EditorTab;
+  value: Exclude<EditorTab, 'preview'>;
   label: string;
   icon: IconSvgElement;
 }
@@ -54,6 +51,9 @@ const SidePanel: FC<ISidePanelProps> = ({
   docxBusy,
   atsBusy,
 }) => {
+  const desktopTab: Exclude<EditorTab, 'preview'> =
+    activeTab === 'preview' ? 'sections' : activeTab;
+
   return (
     <aside className="flex h-full w-[320px] shrink-0 flex-col border-r border-border bg-surface-sunk/40 sm:w-[360px]">
       <nav
@@ -62,7 +62,7 @@ const SidePanel: FC<ISidePanelProps> = ({
         className="flex border-b border-border bg-bg/60"
       >
         {tabs.map((tab) => {
-          const active = activeTab === tab.value;
+          const active = desktopTab === tab.value;
           return (
             <button
               key={tab.value}
@@ -90,22 +90,18 @@ const SidePanel: FC<ISidePanelProps> = ({
       </nav>
 
       <div className="flex-1 overflow-y-auto scrollbar-slim">
-        {activeTab === 'sections' ? <SectionsTab /> : null}
-        {activeTab === 'template' ? <TemplateTab /> : null}
-        {activeTab === 'theme' ? <ThemeTab /> : null}
-        {activeTab === 'export' ? (
-          <ExportTab
-            onDownloadPdf={onDownloadPdf}
-            onDownloadDocx={onDownloadDocx}
-            onDownloadJson={onDownloadJson}
-            onAtsCheck={onAtsCheck}
-            jobDescription={jobDescription}
-            onChangeJobDescription={onChangeJobDescription}
-            pdfBusy={pdfBusy}
-            docxBusy={docxBusy}
-            atsBusy={atsBusy}
-          />
-        ) : null}
+        <EditorTabContent
+          activeTab={desktopTab}
+          onDownloadPdf={onDownloadPdf}
+          onDownloadDocx={onDownloadDocx}
+          onDownloadJson={onDownloadJson}
+          onAtsCheck={onAtsCheck}
+          jobDescription={jobDescription}
+          onChangeJobDescription={onChangeJobDescription}
+          pdfBusy={pdfBusy}
+          docxBusy={docxBusy}
+          atsBusy={atsBusy}
+        />
       </div>
     </aside>
   );

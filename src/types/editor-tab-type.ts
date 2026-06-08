@@ -1,1 +1,1 @@
-export type EditorTab = 'sections' | 'template' | 'theme' | 'export';
+export type EditorTab = 'sections' | 'template' | 'theme' | 'export' | 'preview';

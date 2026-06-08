@@ -1,7 +1,10 @@
-import { type FC } from 'react';
+import { type FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import ResumePreview from '@/components/ResumePreview/ResumePreview';
 import { useResumeStore } from '@/store/resumeStore';
 import { resumeToFixture } from '@/helpers';
+import { useIsDesktop } from '@/hooks/useIsDesktop';
+
+const CANVAS_NATURAL_WIDTH = 820;
 
 const EditorCanvas: FC = () => {
   const resume = useResumeStore((s) => s.resume);
@@ -12,6 +15,83 @@ const EditorCanvas: FC = () => {
   const typeScale = useResumeStore((s) => s.theme.typeScale);
   const lineHeight = useResumeStore((s) => s.theme.lineHeight);
   const fixture = resumeToFixture(resume);
+  const isDesktop = useIsDesktop();
+
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const paperRef = useRef<HTMLDivElement | null>(null);
+  const [scale, setScale] = useState(1);
+  const [paperHeight, setPaperHeight] = useState<number | null>(null);
+
+  useLayoutEffect(() => {
+    if (isDesktop) {
+      setScale(1);
+      return;
+    }
+    const node = wrapperRef.current;
+    if (!node) return;
+    const compute = () => {
+      const w = node.clientWidth;
+      const target = w - 24;
+      setScale(Math.min(1, target / CANVAS_NATURAL_WIDTH));
+    };
+    compute();
+    const ro = new ResizeObserver(compute);
+    ro.observe(node);
+    return () => ro.disconnect();
+  }, [isDesktop]);
+
+  useEffect(() => {
+    if (isDesktop) return;
+    const node = paperRef.current;
+    if (!node) return;
+    const update = () => setPaperHeight(node.offsetHeight);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(node);
+    return () => ro.disconnect();
+  }, [isDesktop, templateId, resume]);
+
+  if (!isDesktop) {
+    return (
+      <div ref={wrapperRef} className="relative h-full overflow-y-auto scrollbar-slim bg-bg">
+        <div className="px-3 pt-4 pb-10">
+          <div
+            className="mx-auto"
+            style={{
+              width: CANVAS_NATURAL_WIDTH * scale,
+              height: paperHeight ? paperHeight * scale : undefined,
+            }}
+          >
+            <div
+              ref={paperRef}
+              className="origin-top-left shadow-canvas rounded-canvas overflow-hidden bg-resume-paper"
+              style={{
+                width: CANVAS_NATURAL_WIDTH,
+                transform: `scale(${scale})`,
+                transformOrigin: 'top left',
+                outline: '1px solid oklch(1 0 0 / 0.04)',
+                outlineOffset: '-1px',
+              }}
+            >
+              <ResumePreview
+                variant={templateId}
+                resume={fixture}
+                accentColor={accentColor}
+                headingFont={headingFont}
+                bodyFont={bodyFont}
+                typeScale={typeScale}
+                lineHeight={lineHeight}
+                interactive={false}
+              />
+            </div>
+          </div>
+          <p className="mt-4 text-center font-mono text-2xs tabular-nums text-muted">
+            {resume['x-builder'].paperSize === 'A4' ? 'A4' : 'letter'} · 1 of 1
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative h-full overflow-y-auto scrollbar-slim bg-bg">

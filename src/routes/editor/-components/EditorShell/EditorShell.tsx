@@ -4,6 +4,8 @@ import { saveAs } from 'file-saver';
 import EditorTopBar from '../EditorTopBar/EditorTopBar';
 import SidePanel from '../SidePanel/SidePanel';
 import EditorCanvas from '../EditorCanvas/EditorCanvas';
+import EditorTabContent from '../EditorTabContent/EditorTabContent';
+import MobileTabBar from '../MobileTabBar/MobileTabBar';
 import AtsCheckModal from '../AtsCheckModal/AtsCheckModal';
 import { useResumeStore } from '@/store/resumeStore';
 import { getResume } from '@/db/repository';
@@ -11,6 +13,7 @@ import { startAutosave, stopAutosave, flushAutosaveNow } from '@/store/middlewar
 import { generatePdf } from '@/pdf/generatePdf';
 import { atsCheck } from '@/pdf/atsCheck';
 import { generateDocx } from '@/docx/generateDocx';
+import { useIsDesktop } from '@/hooks/useIsDesktop';
 import type { EditorTab } from '@/types/editor-tab-type';
 import type { IAtsCheckResult } from '@/interfaces/i-ats-check-result';
 
@@ -35,6 +38,7 @@ const EditorShell: FC<IEditorShellProps> = ({ resumeId }) => {
   const theme = useResumeStore((s) => s.theme);
   const reset = useResumeStore((s) => s.reset);
 
+  const isDesktop = useIsDesktop();
   const [activeTab, setActiveTab] = useState<EditorTab>('sections');
   const [loadState, setLoadState] = useState<'loading' | 'ready' | 'missing'>('loading');
   const [pdfBusy, setPdfBusy] = useState(false);
@@ -133,27 +137,62 @@ const EditorShell: FC<IEditorShellProps> = ({ resumeId }) => {
     );
   }
 
-  return (
-    <div className="flex h-screen flex-col bg-bg">
-      <EditorTopBar onDownload={handleDownloadPdf} downloading={pdfBusy} />
-      <div className="flex flex-1 overflow-hidden">
-        <SidePanel
-          activeTab={activeTab}
-          onChangeTab={setActiveTab}
-          onDownloadPdf={handleDownloadPdf}
-          onDownloadDocx={handleDownloadDocx}
-          onDownloadJson={handleDownloadJson}
-          onAtsCheck={handleAtsCheck}
-          jobDescription={jobDescription}
-          onChangeJobDescription={setJobDescription}
-          pdfBusy={pdfBusy}
-          docxBusy={docxBusy}
-          atsBusy={atsBusy}
+  if (isDesktop) {
+    return (
+      <div className="flex h-screen flex-col bg-bg">
+        <EditorTopBar onDownload={handleDownloadPdf} downloading={pdfBusy} />
+        <div className="flex flex-1 overflow-hidden">
+          <SidePanel
+            activeTab={activeTab}
+            onChangeTab={setActiveTab}
+            onDownloadPdf={handleDownloadPdf}
+            onDownloadDocx={handleDownloadDocx}
+            onDownloadJson={handleDownloadJson}
+            onAtsCheck={handleAtsCheck}
+            jobDescription={jobDescription}
+            onChangeJobDescription={setJobDescription}
+            pdfBusy={pdfBusy}
+            docxBusy={docxBusy}
+            atsBusy={atsBusy}
+          />
+          <main className="flex-1 overflow-hidden">
+            <EditorCanvas />
+          </main>
+        </div>
+        <AtsCheckModal
+          open={atsOpen}
+          busy={atsBusy}
+          result={atsResult}
+          onClose={() => setAtsOpen(false)}
         />
-        <main className="flex-1 overflow-hidden">
-          <EditorCanvas />
-        </main>
       </div>
+    );
+  }
+
+  return (
+    <div className="flex h-[100dvh] flex-col bg-bg">
+      <EditorTopBar onDownload={handleDownloadPdf} downloading={pdfBusy} />
+      <main className="flex-1 overflow-hidden">
+        {activeTab === 'preview' ? (
+          <EditorCanvas />
+        ) : (
+          <div className="h-full overflow-y-auto scrollbar-slim">
+            <EditorTabContent
+              activeTab={activeTab}
+              onDownloadPdf={handleDownloadPdf}
+              onDownloadDocx={handleDownloadDocx}
+              onDownloadJson={handleDownloadJson}
+              onAtsCheck={handleAtsCheck}
+              jobDescription={jobDescription}
+              onChangeJobDescription={setJobDescription}
+              pdfBusy={pdfBusy}
+              docxBusy={docxBusy}
+              atsBusy={atsBusy}
+            />
+          </div>
+        )}
+      </main>
+      <MobileTabBar activeTab={activeTab} onChangeTab={setActiveTab} />
       <AtsCheckModal
         open={atsOpen}
         busy={atsBusy}

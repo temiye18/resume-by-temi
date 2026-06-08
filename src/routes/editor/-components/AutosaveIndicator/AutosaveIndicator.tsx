@@ -22,8 +22,10 @@ const AutosaveIndicator: FC = () => {
   return (
     <span
       key={tick}
-      className="inline-flex items-center gap-2 font-mono text-2xs tabular-nums text-muted"
+      className="inline-flex items-center gap-2 whitespace-nowrap font-mono text-2xs tabular-nums text-muted"
       aria-live="polite"
+      aria-label={label}
+      title={label}
     >
       <span
         className={cn(
@@ -36,7 +38,7 @@ const AutosaveIndicator: FC = () => {
         )}
         aria-hidden
       />
-      {label}
+      <span className="hidden sm:inline">{label}</span>
     </span>
   );
 };
