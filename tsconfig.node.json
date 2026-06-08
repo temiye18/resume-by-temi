@@ -23,7 +23,6 @@
     "vite.config.ts",
     "vitest.config.ts",
     "playwright.config.ts",
-    "server/**/*.ts",
-    "functions/**/*.ts"
+    "server/**/*.ts"
   ]
 }

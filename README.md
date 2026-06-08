@@ -50,10 +50,18 @@ pnpm build                 # production build → dist/
 
 The dashboard's **Smart parse** import uses Gemini 2.5 Flash through a server-side proxy. The proxy lives in two equivalent places, one per runtime:
 
-- **In production** (Cloudflare Pages) — `functions/api/parse-resume.ts` runs as a Pages Function; the key comes from the `GEMINI_API_KEY` env binding set in the Cloudflare dashboard.
+- **In production** (Cloudflare Workers + Static Assets) — `server/worker.ts` is the Worker entry declared in `wrangler.toml`. It routes `POST /api/parse-resume` to the Gemini helper and passes everything else through the `ASSETS` binding to the built SPA (`dist/`). The key comes from the `GEMINI_API_KEY` env binding set in the Cloudflare dashboard.
 - **In `pnpm dev`** (Vite) — `server/parse-resume-dev-plugin.ts` registers `/api/parse-resume` as a dev-server middleware; the key comes from `GEMINI_API_KEY` in your `.env` file (no `VITE_` prefix — that prefix would leak the key to the browser bundle).
 
-Both wrappers call the same `server/gemini-parse.ts` helper, so behaviour is identical. Without `GEMINI_API_KEY` set, Smart parse will surface a 500 with a clear message and Smart parse automatically falls back to the local heuristic parser; the rest of the editor is unaffected.
+Both call the same `server/gemini-parse.ts` helper, so behaviour is identical. Without `GEMINI_API_KEY` set, Smart parse will surface a 500 with a clear message and the client automatically falls back to the local heuristic parser; the rest of the editor is unaffected.
+
+### Cloudflare deployment
+
+1. Push to the connected git branch. Cloudflare reads `wrangler.toml`, runs `pnpm build`, bundles `server/worker.ts`, and uploads `dist/` as static assets.
+2. In the Cloudflare dashboard → your Worker → **Settings → Variables and secrets**, add:
+   - `GEMINI_API_KEY` (Secret) — your Gemini API key.
+   - `ALLOWED_ORIGINS` (Plaintext, recommended) — comma-separated origins, e.g. `https://your-project.your-account.workers.dev`. Leave unset to allow any origin (not recommended in production — exposes your Gemini quota).
+3. Trigger a redeploy so the new bindings propagate.
 
 ## Project Status
 
