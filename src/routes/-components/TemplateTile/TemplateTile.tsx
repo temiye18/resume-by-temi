@@ -74,7 +74,7 @@ const TemplateTile: FC<ITemplateTileProps> = ({ variant, name, caption, index })
               },
             }}
           >
-            <ResumePreview variant={variant} />
+            <ResumePreview variant={variant} interactive={false} />
           </m.div>
         </m.div>
 

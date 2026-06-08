@@ -1,4 +1,5 @@
 export { janeDoe } from './jane-doe';
+export { janeDoeResume } from './jane-doe-resume';
 export { themeOptions } from './theme-options';
 export { templateTiles } from './template-tiles';
 export { landingPrinciples } from './landing-principles';

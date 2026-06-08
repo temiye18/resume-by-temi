@@ -85,6 +85,7 @@ const ResumeCard: FC<IResumeCardProps> = ({ record }) => {
               headingFont={record.theme?.headingFont}
               bodyFont={record.theme?.bodyFont}
               className="aspect-[8.5/11] overflow-hidden"
+              interactive={false}
             />
           </div>
         </div>

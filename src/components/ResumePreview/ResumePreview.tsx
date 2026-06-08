@@ -16,6 +16,7 @@ interface IResumePreviewProps {
   typeScale?: number;
   lineHeight?: number;
   className?: string;
+  interactive?: boolean;
 }
 
 const formatDateRange = (start: string, end: string): string => {
@@ -36,7 +37,7 @@ const fontStack = (family?: string, fallback = 'serif'): string => {
 
 const linkClass = 'text-inherit no-underline hover:text-accent';
 
-const renderContactLine = (resume: IFixtureResume): ReactNode => {
+const renderContactLine = (resume: IFixtureResume, interactive: boolean): ReactNode => {
   const parts: { key: string; node: ReactNode }[] = [];
   if (resume.contact.location) {
     parts.push({ key: 'loc', node: resume.contact.location });
@@ -44,30 +45,34 @@ const renderContactLine = (resume: IFixtureResume): ReactNode => {
   if (resume.contact.email) {
     parts.push({
       key: 'email',
-      node: (
+      node: interactive ? (
         <a href={`mailto:${resume.contact.email}`} className={linkClass}>
           {resume.contact.email}
         </a>
+      ) : (
+        <span>{resume.contact.email}</span>
       ),
     });
   }
   if (resume.contact.phone) {
     parts.push({
       key: 'phone',
-      node: (
+      node: interactive ? (
         <a
           href={`tel:${resume.contact.phone.replace(/[^+\d]/g, '')}`}
           className={linkClass}
         >
           {resume.contact.phone}
         </a>
+      ) : (
+        <span>{resume.contact.phone}</span>
       ),
     });
   }
   resume.contact.profiles.forEach((p, idx) => {
     parts.push({
       key: `p-${idx}`,
-      node: (
+      node: interactive ? (
         <a
           href={p.url}
           target="_blank"
@@ -76,6 +81,8 @@ const renderContactLine = (resume: IFixtureResume): ReactNode => {
         >
           {p.label}
         </a>
+      ) : (
+        <span>{p.label}</span>
       ),
     });
   });
@@ -98,6 +105,7 @@ const ResumePreview: FC<IResumePreviewProps> = ({
   typeScale,
   lineHeight,
   className,
+  interactive = true,
 }) => {
   const v = resumeVariantStyles[variant];
   const isCentered = variant === 'classic-serif';
@@ -143,7 +151,7 @@ const ResumePreview: FC<IResumePreviewProps> = ({
         </h1>
         <p className={v.label}>{resume.label}</p>
         {v.rule ? <div className={v.rule} aria-hidden /> : null}
-        <p className={v.contact}>{renderContactLine(resume)}</p>
+        <p className={v.contact}>{renderContactLine(resume, interactive)}</p>
       </header>
 
       <section>
