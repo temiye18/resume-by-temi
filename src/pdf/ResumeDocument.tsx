@@ -99,18 +99,28 @@ const ResumeDocument: FC<IResumeDocumentProps> = ({ resume, templateId, theme, t
           <View>
             <Text style={style.sectionHeading}>Experience</Text>
             {resume.work.map((entry) => (
-              <View key={entry.id} style={style.entryRow} wrap={false}>
-                <View style={style.entryHeader}>
-                  <Text>
-                    <Text style={style.entryRole}>{entry.position}</Text>
-                    <Text style={style.entryCompany}>{' · '}{entry.name}</Text>
-                  </Text>
-                  <Text style={style.entryDates}>
-                    {formatPdfDateRange(entry.startDate, entry.endDate)}
-                  </Text>
+              <View key={entry.id} style={style.entryRow}>
+                <View wrap={false}>
+                  <View style={style.entryHeader}>
+                    <Text>
+                      <Text style={style.entryRole}>{entry.position}</Text>
+                      <Text style={style.entryCompany}>{' · '}{entry.name}</Text>
+                    </Text>
+                    <Text style={style.entryDates}>
+                      {formatPdfDateRange(entry.startDate, entry.endDate)}
+                    </Text>
+                  </View>
+                  {entry.highlights[0] ? (
+                    <View style={style.bullet}>
+                      <Text>{'• '}</Text>
+                      <Text style={style.bulletText}>
+                        <MarkdownRuns source={entry.highlights[0]} accentColor={style.accentColor} />
+                      </Text>
+                    </View>
+                  ) : null}
                 </View>
-                {entry.highlights.map((h, i) => (
-                  <View key={i} style={style.bullet}>
+                {entry.highlights.slice(1).map((h, i) => (
+                  <View key={i + 1} style={style.bullet}>
                     <Text>{'• '}</Text>
                     <Text style={style.bulletText}>
                       <MarkdownRuns source={h} accentColor={style.accentColor} />
@@ -126,19 +136,29 @@ const ResumeDocument: FC<IResumeDocumentProps> = ({ resume, templateId, theme, t
           <View>
             <Text style={style.sectionHeading}>Education</Text>
             {resume.education.map((entry) => (
-              <View key={entry.id} style={style.entryRow} wrap={false}>
-                <View style={style.entryHeader}>
-                  <Text>
-                    <Text style={style.entryRole}>{entry.institution}</Text>
-                    <Text style={style.entryCompany}>
-                      {' · '}
-                      {[entry.studyType, entry.area].filter(Boolean).join(' ')}
+              <View key={entry.id} style={style.entryRow}>
+                <View wrap={false}>
+                  <View style={style.entryHeader}>
+                    <Text>
+                      <Text style={style.entryRole}>{entry.institution}</Text>
+                      <Text style={style.entryCompany}>
+                        {' · '}
+                        {[entry.studyType, entry.area].filter(Boolean).join(' ')}
+                      </Text>
                     </Text>
-                  </Text>
-                  <Text style={style.entryDates}>{entry.endDate ?? ''}</Text>
+                    <Text style={style.entryDates}>{entry.endDate ?? ''}</Text>
+                  </View>
+                  {entry.highlights[0] ? (
+                    <View style={style.bullet}>
+                      <Text>{'• '}</Text>
+                      <Text style={style.bulletText}>
+                        <MarkdownRuns source={entry.highlights[0]} accentColor={style.accentColor} />
+                      </Text>
+                    </View>
+                  ) : null}
                 </View>
-                {entry.highlights.map((h, i) => (
-                  <View key={i} style={style.bullet}>
+                {entry.highlights.slice(1).map((h, i) => (
+                  <View key={i + 1} style={style.bullet}>
                     <Text>{'• '}</Text>
                     <Text style={style.bulletText}>
                       <MarkdownRuns source={h} accentColor={style.accentColor} />
@@ -166,15 +186,26 @@ const ResumeDocument: FC<IResumeDocumentProps> = ({ resume, templateId, theme, t
           <View>
             <Text style={style.sectionHeading}>Projects</Text>
             {resume.projects.map((entry) => (
-              <View key={entry.id} style={style.entryRow} wrap={false}>
-                <View style={style.entryHeader}>
-                  <Text style={style.entryRole}>{entry.name}</Text>
-                  <Text style={style.entryDates}>
-                    {formatPdfDateRange(entry.startDate, entry.endDate)}
-                  </Text>
+              <View key={entry.id} style={style.entryRow}>
+                <View wrap={false}>
+                  <View style={style.entryHeader}>
+                    <Text style={style.entryRole}>{entry.name}</Text>
+                    <Text style={style.entryDates}>
+                      {formatPdfDateRange(entry.startDate, entry.endDate)}
+                    </Text>
+                  </View>
+                  {entry.description ? (
+                    <Text style={style.summary}>{entry.description}</Text>
+                  ) : entry.highlights[0] ? (
+                    <View style={style.bullet}>
+                      <Text>{'• '}</Text>
+                      <Text style={style.bulletText}>
+                        <MarkdownRuns source={entry.highlights[0]} accentColor={style.accentColor} />
+                      </Text>
+                    </View>
+                  ) : null}
                 </View>
-                {entry.description ? <Text style={style.summary}>{entry.description}</Text> : null}
-                {entry.highlights.map((h, i) => (
+                {(entry.description ? entry.highlights : entry.highlights.slice(1)).map((h, i) => (
                   <View key={i} style={style.bullet}>
                     <Text>{'• '}</Text>
                     <Text style={style.bulletText}>
@@ -249,18 +280,28 @@ const ResumeDocument: FC<IResumeDocumentProps> = ({ resume, templateId, theme, t
           <View>
             <Text style={style.sectionHeading}>Volunteer Experience</Text>
             {resume.volunteer.map((entry) => (
-              <View key={entry.id} style={style.entryRow} wrap={false}>
-                <View style={style.entryHeader}>
-                  <Text>
-                    <Text style={style.entryRole}>{entry.position}</Text>
-                    <Text style={style.entryCompany}>{' · '}{entry.organization}</Text>
-                  </Text>
-                  <Text style={style.entryDates}>
-                    {formatPdfDateRange(entry.startDate, entry.endDate)}
-                  </Text>
+              <View key={entry.id} style={style.entryRow}>
+                <View wrap={false}>
+                  <View style={style.entryHeader}>
+                    <Text>
+                      <Text style={style.entryRole}>{entry.position}</Text>
+                      <Text style={style.entryCompany}>{' · '}{entry.organization}</Text>
+                    </Text>
+                    <Text style={style.entryDates}>
+                      {formatPdfDateRange(entry.startDate, entry.endDate)}
+                    </Text>
+                  </View>
+                  {entry.highlights[0] ? (
+                    <View style={style.bullet}>
+                      <Text>{'• '}</Text>
+                      <Text style={style.bulletText}>
+                        <MarkdownRuns source={entry.highlights[0]} accentColor={style.accentColor} />
+                      </Text>
+                    </View>
+                  ) : null}
                 </View>
-                {entry.highlights.map((h, i) => (
-                  <View key={i} style={style.bullet}>
+                {entry.highlights.slice(1).map((h, i) => (
+                  <View key={i + 1} style={style.bullet}>
                     <Text>{'• '}</Text>
                     <Text style={style.bulletText}>
                       <MarkdownRuns source={h} accentColor={style.accentColor} />

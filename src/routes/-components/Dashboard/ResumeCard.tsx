@@ -9,7 +9,7 @@ import {
 } from '@hugeicons/core-free-icons';
 import ResumePreview from '@/components/ResumePreview/ResumePreview';
 import { cn } from '@/lib/cn';
-import { formatRelativeTime } from '@/helpers';
+import { formatRelativeTime, resumeToFixture } from '@/helpers';
 import {
   renameResume,
   duplicateResume,
@@ -80,7 +80,11 @@ const ResumeCard: FC<IResumeCardProps> = ({ record }) => {
           >
             <ResumePreview
               variant={record.templateId as ResumeVariant}
-              resume={undefined}
+              resume={resumeToFixture(record.resume)}
+              accentColor={record.theme?.accentColor}
+              headingFont={record.theme?.headingFont}
+              bodyFont={record.theme?.bodyFont}
+              className="aspect-[8.5/11] overflow-hidden"
             />
           </div>
         </div>

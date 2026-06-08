@@ -9,6 +9,8 @@ const EditorCanvas: FC = () => {
   const accentColor = useResumeStore((s) => s.theme.accentColor);
   const headingFont = useResumeStore((s) => s.theme.headingFont);
   const bodyFont = useResumeStore((s) => s.theme.bodyFont);
+  const typeScale = useResumeStore((s) => s.theme.typeScale);
+  const lineHeight = useResumeStore((s) => s.theme.lineHeight);
   const fixture = resumeToFixture(resume);
 
   return (
@@ -35,6 +37,8 @@ const EditorCanvas: FC = () => {
             accentColor={accentColor}
             headingFont={headingFont}
             bodyFont={bodyFont}
+            typeScale={typeScale}
+            lineHeight={lineHeight}
           />
         </div>
 

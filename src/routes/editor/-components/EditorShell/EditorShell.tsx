@@ -59,8 +59,8 @@ const EditorShell: FC<IEditorShellProps> = ({ resumeId }) => {
     })();
     return () => {
       cancelled = true;
-      void flushAutosaveNow();
       stopAutosave(false);
+      void flushAutosaveNow();
       reset();
     };
   }, [resumeId, load, reset]);

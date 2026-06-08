@@ -13,6 +13,8 @@ interface IResumePreviewProps {
   accentColor?: string;
   headingFont?: string;
   bodyFont?: string;
+  typeScale?: number;
+  lineHeight?: number;
   className?: string;
 }
 
@@ -93,6 +95,8 @@ const ResumePreview: FC<IResumePreviewProps> = ({
   accentColor,
   headingFont,
   bodyFont,
+  typeScale,
+  lineHeight,
   className,
 }) => {
   const v = resumeVariantStyles[variant];
@@ -108,12 +112,13 @@ const ResumePreview: FC<IResumePreviewProps> = ({
   if (bodyFont) {
     articleStyle['--font-sans'] = fontStack(bodyFont, 'system-ui, sans-serif');
   }
+  if (typeScale) articleStyle['--resume-type-scale'] = String(typeScale);
+  if (lineHeight) articleStyle['--resume-line-height'] = String(lineHeight);
 
   return (
     <article
       className={cn(
-        'bg-[var(--resume-paper)] text-[var(--resume-ink)] aspect-[8.5/11]',
-        'overflow-hidden w-full',
+        'bg-[var(--resume-paper)] text-[var(--resume-ink)] w-full',
         v.paper,
         className,
       )}
