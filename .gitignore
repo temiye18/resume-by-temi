@@ -63,3 +63,9 @@ CLAUDE.md
 
 # Screenshots from test/dev runs
 .tmp-shots/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example
