@@ -4,9 +4,11 @@ import tailwindcss from '@tailwindcss/vite';
 import { TanStackRouterVite } from '@tanstack/router-plugin/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'node:path';
+import { parseResumeDevPlugin } from './server/parse-resume-dev-plugin';
 
 export default defineConfig({
   plugins: [
+    parseResumeDevPlugin(),
     TanStackRouterVite({ target: 'react', autoCodeSplitting: true }),
     react(),
     tailwindcss(),

@@ -4,3 +4,5 @@ export { resumeToFixture } from './resume-to-fixture';
 export { stripMarkdown } from './strip-markdown';
 export { displayProfileText } from './display-profile';
 export { recognizeSkills, groupSkillsByCategory } from './recognize-skills';
+export { extractResumeText } from './extract-resume-text';
+export { parseResumeText, type IResumeParseResult } from './parse-resume-text';

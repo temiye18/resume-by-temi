@@ -127,7 +127,8 @@ const Hero: FC = () => {
           >
             No account, no watermark, no export paywall. The PDFs you download here parse cleanly
             in every major Applicant Tracking System, and look like you spent a Saturday on them.
-            The whole tool runs in your browser and the resume content never leaves your machine.
+            The editor runs entirely in your browser; the one moment résumé content can leave
+            your machine is if you opt in to Smart parse on import.
           </p>
 
           <div className="flex flex-wrap items-center gap-3 lg:justify-end">
