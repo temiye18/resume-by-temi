@@ -160,6 +160,8 @@ pnpm build                 # tsc -b && vite build → dist/
 pnpm preview               # serve the production build
 pnpm lint                  # eslint
 pnpm format                # prettier --write
+pnpm video:dev             # open the Remotion studio (preview the 30s demo)
+pnpm video:render          # render the demo to out/demo.mp4
 ```
 
 ### Smart parse env
@@ -239,6 +241,23 @@ The editor stays on your machine. Every keystroke is autosaved to IndexedDB on y
 The single exception is **opt-in Smart parse** on import: that path sends the file you choose to Google's Gemini API through our proxy. We log nothing on our side; Google's retention policy applies to what they receive. A local-only heuristic parser remains available for users who'd rather not involve Gemini.
 
 See the in-app `/privacy` page for the full disclosure.
+
+---
+
+## Demo video
+
+A 30-second product demo lives in `remotion/`, built with [Remotion](https://www.remotion.dev). Seven scenes — intro, hook, smart-parse demo, editor, ATS check, privacy moment, closing — composed at 1920×1080 / 30fps. Same design language as the product (Vollkorn + Bricolage + Geist Mono, the deep amber accent, `easeOutExpo` motion).
+
+```bash
+pnpm video:dev              # open the Remotion studio for live preview
+pnpm video:render           # render to out/demo.mp4 (~30s wall-clock for 30s of video on a modern laptop)
+```
+
+A still from the smart-parse scene (frame 270 of 900):
+
+![Smart parse scene from the demo video](./docs/screenshots/video/smart-parse-frame.png)
+
+The scenes don't import the live product components — Remotion ships its own webpack bundler and Tailwind v4 / Lenis / motion-react don't compose cleanly into it. Instead each scene is a Remotion-native component that mirrors the product 1:1, using the same OKLCH tokens and font families. If you update the product's design tokens, mirror the change in `remotion/lib/tokens.ts`.
 
 ---
 

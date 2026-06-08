@@ -64,3 +64,6 @@ TODO.md
 
 # Screenshots from test/dev runs
 .tmp-shots/
+
+# Remotion rendered video output
+out/
