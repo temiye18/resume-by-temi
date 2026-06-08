@@ -39,7 +39,7 @@ const AiParseShell: FC<IAiParseShellProps> = ({
   return (
     <div
       className={cn(
-        'flex w-full flex-col gap-6 rounded-md border border-border bg-bg p-7 shadow-modal overflow-hidden',
+        'flex w-full flex-col gap-4 rounded-md border border-border bg-bg p-4 shadow-modal overflow-hidden sm:gap-6 sm:p-7',
         className,
       )}
     >
@@ -61,7 +61,7 @@ const AiParseShell: FC<IAiParseShellProps> = ({
               {fallbackEngaged ? 'flash-lite' : 'gemini 2.5 flash'}
             </span>
           </p>
-          <h2 className="font-display text-2xl font-medium text-ink text-balance">
+          <h2 className="font-display text-xl sm:text-2xl font-medium text-ink text-balance">
             Reading your résumé.
           </h2>
         </div>

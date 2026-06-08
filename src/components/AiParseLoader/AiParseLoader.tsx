@@ -36,7 +36,7 @@ const AiParseLoader: FC<IAiParseLoaderProps> = ({
     <AnimatePresence>
       {open ? (
         <m.div
-          className="fixed inset-0 z-50 flex items-center justify-center px-4"
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-3 py-4 sm:items-center sm:px-4 sm:py-8"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -46,9 +46,9 @@ const AiParseLoader: FC<IAiParseLoaderProps> = ({
           aria-label="Parsing your résumé"
           aria-live="polite"
         >
-          <div className="absolute inset-0 bg-bg/90 backdrop-blur-[3px]" aria-hidden />
+          <div className="fixed inset-0 bg-bg/90 backdrop-blur-[3px]" aria-hidden />
           <m.div
-            className="relative w-full max-w-[760px]"
+            className="relative my-auto w-full max-w-[760px]"
             initial={{ y: 12, scale: 0.985, opacity: 0 }}
             animate={{ y: 0, scale: 1, opacity: 1 }}
             exit={{ y: 8, scale: 0.985, opacity: 0 }}

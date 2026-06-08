@@ -36,7 +36,7 @@ const ScanPanel: FC = () => {
       </div>
       <div
         className={cn(
-          'relative aspect-[3/4.2] w-full overflow-hidden rounded-xs',
+          'relative aspect-[5/3] sm:aspect-[3/4.2] w-full overflow-hidden rounded-xs',
           'border border-border bg-surface-sunk/40',
         )}
         aria-hidden
