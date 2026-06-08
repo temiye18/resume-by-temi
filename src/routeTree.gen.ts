@@ -9,38 +9,141 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as AppRouteImport } from './routes/app'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TemplatesIndexRouteImport } from './routes/templates/index'
+import { Route as TemplatesVariantRouteImport } from './routes/templates/$variant'
+import { Route as EditorResumeIdRouteImport } from './routes/editor/$resumeId'
 
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TemplatesIndexRoute = TemplatesIndexRouteImport.update({
+  id: '/templates/',
+  path: '/templates/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TemplatesVariantRoute = TemplatesVariantRouteImport.update({
+  id: '/templates/$variant',
+  path: '/templates/$variant',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EditorResumeIdRoute = EditorResumeIdRouteImport.update({
+  id: '/editor/$resumeId',
+  path: '/editor/$resumeId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/app': typeof AppRoute
+  '/privacy': typeof PrivacyRoute
+  '/editor/$resumeId': typeof EditorResumeIdRoute
+  '/templates/$variant': typeof TemplatesVariantRoute
+  '/templates/': typeof TemplatesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/app': typeof AppRoute
+  '/privacy': typeof PrivacyRoute
+  '/editor/$resumeId': typeof EditorResumeIdRoute
+  '/templates/$variant': typeof TemplatesVariantRoute
+  '/templates': typeof TemplatesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/app': typeof AppRoute
+  '/privacy': typeof PrivacyRoute
+  '/editor/$resumeId': typeof EditorResumeIdRoute
+  '/templates/$variant': typeof TemplatesVariantRoute
+  '/templates/': typeof TemplatesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/app'
+    | '/privacy'
+    | '/editor/$resumeId'
+    | '/templates/$variant'
+    | '/templates/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/about'
+    | '/app'
+    | '/privacy'
+    | '/editor/$resumeId'
+    | '/templates/$variant'
+    | '/templates'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/app'
+    | '/privacy'
+    | '/editor/$resumeId'
+    | '/templates/$variant'
+    | '/templates/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  AppRoute: typeof AppRoute
+  PrivacyRoute: typeof PrivacyRoute
+  EditorResumeIdRoute: typeof EditorResumeIdRoute
+  TemplatesVariantRoute: typeof TemplatesVariantRoute
+  TemplatesIndexRoute: typeof TemplatesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +151,38 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/templates/': {
+      id: '/templates/'
+      path: '/templates'
+      fullPath: '/templates/'
+      preLoaderRoute: typeof TemplatesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/templates/$variant': {
+      id: '/templates/$variant'
+      path: '/templates/$variant'
+      fullPath: '/templates/$variant'
+      preLoaderRoute: typeof TemplatesVariantRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/editor/$resumeId': {
+      id: '/editor/$resumeId'
+      path: '/editor/$resumeId'
+      fullPath: '/editor/$resumeId'
+      preLoaderRoute: typeof EditorResumeIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  AppRoute: AppRoute,
+  PrivacyRoute: PrivacyRoute,
+  EditorResumeIdRoute: EditorResumeIdRoute,
+  TemplatesVariantRoute: TemplatesVariantRoute,
+  TemplatesIndexRoute: TemplatesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,6 +1,7 @@
-import { type FC } from 'react';
+import { type FC, type ReactNode, Fragment } from 'react';
 import { cn } from '@/lib/cn';
 import { janeDoe, resumeVariantStyles } from '@/constants';
+import MarkdownText from '@/components/MarkdownText/MarkdownText';
 import type { ResumeVariant } from '@/types/resume-variant-type';
 import type { IFixtureResume } from '@/interfaces/i-fixture-resume';
 
@@ -9,6 +10,9 @@ interface IResumePreviewProps {
   resume?: IFixtureResume;
   showCursor?: boolean;
   cursorActive?: boolean;
+  accentColor?: string;
+  headingFont?: string;
+  bodyFont?: string;
   className?: string;
 }
 
@@ -23,15 +27,87 @@ const formatDateRange = (start: string, end: string): string => {
   return `${fmt(start)} — ${fmt(end)}`;
 };
 
+const fontStack = (family?: string, fallback = 'serif'): string => {
+  if (!family) return '';
+  return `'${family}', ${fallback}`;
+};
+
+const linkClass = 'text-inherit no-underline hover:text-accent';
+
+const renderContactLine = (resume: IFixtureResume): ReactNode => {
+  const parts: { key: string; node: ReactNode }[] = [];
+  if (resume.contact.location) {
+    parts.push({ key: 'loc', node: resume.contact.location });
+  }
+  if (resume.contact.email) {
+    parts.push({
+      key: 'email',
+      node: (
+        <a href={`mailto:${resume.contact.email}`} className={linkClass}>
+          {resume.contact.email}
+        </a>
+      ),
+    });
+  }
+  if (resume.contact.phone) {
+    parts.push({
+      key: 'phone',
+      node: (
+        <a
+          href={`tel:${resume.contact.phone.replace(/[^+\d]/g, '')}`}
+          className={linkClass}
+        >
+          {resume.contact.phone}
+        </a>
+      ),
+    });
+  }
+  resume.contact.profiles.forEach((p, idx) => {
+    parts.push({
+      key: `p-${idx}`,
+      node: (
+        <a
+          href={p.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={linkClass}
+        >
+          {p.label}
+        </a>
+      ),
+    });
+  });
+  return parts.map((p, i) => (
+    <Fragment key={p.key}>
+      {i > 0 ? ' · ' : null}
+      {p.node}
+    </Fragment>
+  ));
+};
+
 const ResumePreview: FC<IResumePreviewProps> = ({
   variant = 'modern-minimal',
   resume = janeDoe,
   showCursor = false,
   cursorActive = true,
+  accentColor,
+  headingFont,
+  bodyFont,
   className,
 }) => {
   const v = resumeVariantStyles[variant];
   const isCentered = variant === 'classic-serif';
+
+  const articleStyle: Record<string, string> = {
+    ['--resume-paper']: 'oklch(1 0 0)',
+    ['--resume-ink']: 'oklch(0.15 0 0)',
+    ['--resume-rule']: 'oklch(0.88 0 0)',
+  };
+  if (accentColor) articleStyle['--color-accent'] = accentColor;
+  if (headingFont) articleStyle['--font-display'] = fontStack(headingFont, 'Georgia, serif');
+  if (bodyFont) {
+    articleStyle['--font-sans'] = fontStack(bodyFont, 'system-ui, sans-serif');
+  }
 
   return (
     <article
@@ -42,9 +118,7 @@ const ResumePreview: FC<IResumePreviewProps> = ({
         className,
       )}
       style={{
-        ['--resume-paper' as string]: 'oklch(1 0 0)',
-        ['--resume-ink' as string]: 'oklch(0.15 0 0)',
-        ['--resume-rule' as string]: 'oklch(0.88 0 0)',
+        ...articleStyle,
         ['--resume-muted' as string]: 'oklch(0.5 0 0)',
       }}
       aria-label={`Resume preview, ${variant} template`}
@@ -64,20 +138,14 @@ const ResumePreview: FC<IResumePreviewProps> = ({
         </h1>
         <p className={v.label}>{resume.label}</p>
         {v.rule ? <div className={v.rule} aria-hidden /> : null}
-        <p className={v.contact}>
-          {resume.contact.location}
-          {' · '}
-          {resume.contact.email}
-          {' · '}
-          {resume.contact.phone}
-          {' · '}
-          {resume.contact.profiles.map((p) => p.label).join(' · ')}
-        </p>
+        <p className={v.contact}>{renderContactLine(resume)}</p>
       </header>
 
       <section>
         <h2 className={v.sectionHeading}>Summary</h2>
-        <p className={v.summary}>{resume.summary}</p>
+        <div className={v.summary}>
+          <MarkdownText source={resume.summary} blocks />
+        </div>
       </section>
 
       <section>
@@ -100,7 +168,9 @@ const ResumePreview: FC<IResumePreviewProps> = ({
                   <span aria-hidden className="select-none">
                     •
                   </span>
-                  <span className="flex-1">{bullet.text}</span>
+                  <span className="flex-1">
+                    <MarkdownText source={bullet.text} />
+                  </span>
                 </li>
               ))}
             </ul>

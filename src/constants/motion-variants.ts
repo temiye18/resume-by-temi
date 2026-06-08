@@ -111,3 +111,106 @@ export const tileNumberVariants: Variants = {
 
 export const reducedTransition: Transition = { duration: 0 };
 export const reducedFadeTransition: Transition = { duration: 0.18, ease: 'linear' };
+
+export const sectionContainerVariants: Variants = {
+  hidden: {},
+  visible: {
+    transition: {
+      delayChildren: 0,
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+export const sectionHeadingRevealVariants: Variants = {
+  hidden: { opacity: 0, y: 28 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.75, ease: easeOutExpo },
+  },
+};
+
+export const sectionBodyRevealVariants: Variants = {
+  hidden: { opacity: 0, y: 18 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: easeOutExpo },
+  },
+};
+
+export const atsColumnLeftVariants: Variants = {
+  hidden: { opacity: 0, x: -36 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.85, ease: easeOutExpo },
+  },
+};
+
+export const atsColumnRightVariants: Variants = {
+  hidden: { opacity: 0, x: 36 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.85, ease: easeOutExpo, delay: 0.08 },
+  },
+};
+
+export const atsMedallionVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.4 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.55, ease: easeOutExpo, delay: 0.45 },
+  },
+};
+
+export const galleryTitleVariants: Variants = {
+  hidden: { opacity: 0, y: 28 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: easeOutExpo },
+  },
+};
+
+export const galleryGridVariants: Variants = {
+  hidden: {},
+  visible: {
+    transition: {
+      delayChildren: 0.18,
+      staggerChildren: 0.08,
+    },
+  },
+};
+
+export const galleryTileVariants: Variants = {
+  hidden: { opacity: 0, y: 22, scale: 0.985 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.7, ease: easeOutExpo },
+  },
+};
+
+export const closingHeadlineVariants: Variants = {
+  hidden: { opacity: 0, y: 36 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.95, ease: easeOutExpo },
+  },
+};
+
+export const closingCtaVariants: Variants = {
+  hidden: { opacity: 0, y: 20, scale: 0.96 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.65, ease: easeOutExpo, delay: 0.28 },
+  },
+};

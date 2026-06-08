@@ -26,6 +26,39 @@ importers:
       '@fontsource-variable/vollkorn':
         specifier: ^5.2.10
         version: 5.2.10
+      '@fontsource/eb-garamond':
+        specifier: ^5.2.7
+        version: 5.2.7
+      '@fontsource/ibm-plex-mono':
+        specifier: ^5.2.7
+        version: 5.2.7
+      '@fontsource/ibm-plex-sans':
+        specifier: ^5.2.8
+        version: 5.2.8
+      '@fontsource/inter':
+        specifier: ^5.2.8
+        version: 5.2.8
+      '@fontsource/jetbrains-mono':
+        specifier: ^5.2.8
+        version: 5.2.8
+      '@fontsource/lato':
+        specifier: ^5.2.7
+        version: 5.2.7
+      '@fontsource/lora':
+        specifier: ^5.2.8
+        version: 5.2.8
+      '@fontsource/merriweather':
+        specifier: ^5.2.11
+        version: 5.2.11
+      '@fontsource/open-sans':
+        specifier: ^5.2.7
+        version: 5.2.7
+      '@fontsource/source-sans-3':
+        specifier: ^5.2.9
+        version: 5.2.9
+      '@fontsource/source-serif-4':
+        specifier: ^5.2.9
+        version: 5.2.9
       '@hookform/resolvers':
         specifier: ^3.10.0
         version: 3.10.0(react-hook-form@7.77.0(react@19.2.7))
@@ -74,6 +107,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      date-fns:
+        specifier: ^4.4.0
+        version: 4.4.0
       dexie:
         specifier: ^4.0.11
         version: 4.4.3
@@ -104,6 +140,9 @@ importers:
       react:
         specifier: ^19.0.0
         version: 19.2.7
+      react-day-picker:
+        specifier: ^10.0.1
+        version: 10.0.1(@types/react@19.2.17)(react@19.2.7)
       react-dom:
         specifier: ^19.0.0
         version: 19.2.7(react@19.2.7)
@@ -116,6 +155,9 @@ importers:
       tippy.js:
         specifier: ^6.3.7
         version: 6.3.7
+      tiptap-markdown:
+        specifier: ^0.9.0
+        version: 0.9.0(@tiptap/core@2.27.2(@tiptap/pm@2.27.2))
       zod:
         specifier: ^3.24.1
         version: 3.25.76
@@ -728,6 +770,9 @@ packages:
     resolution: {integrity: sha512-4zBIxpPzowiZpusoFkyGVwakdRJUyuH5PxQ/PrqghfdFWWasvnCdPfQXHrenDai+gyLARulZjZowCOj6fjT4pA==}
     engines: {node: '>=6.9.0'}
 
+  '@date-fns/tz@1.5.0':
+    resolution: {integrity: sha512-lwYN/vDPeNRULcepoE/LO2Pgx+7/RV+S9ARfbc9lr2DtGkOD7pAiruHvbR1RX3Qyf6ja47EWJDMsNK5vK08DJg==}
+
   '@dnd-kit/accessibility@3.1.1':
     resolution: {integrity: sha512-2P+YgaXF+gRsIihwwY1gCsQSYnu9Zyj2py8kY5fFvUM1qm2WA2u639R6YNVfU4GWr+ZM5mqEsfHZZLoRONbemw==}
     peerDependencies:
@@ -952,6 +997,39 @@ packages:
 
   '@fontsource-variable/vollkorn@5.2.10':
     resolution: {integrity: sha512-xsMmoV6OgjuI9K2uKBJW+EyA8EdpRJt+6S9rtfMNYqnbgmq/16Tec8+wyBGG9+c9XGH/1ji3cydru4+9Gf+vnQ==}
+
+  '@fontsource/eb-garamond@5.2.7':
+    resolution: {integrity: sha512-V42tTlHDbnDo0+lENnXKWMx63Llq6Gfl2l7ozkoeRQN60S0jm6hEgCLlOT/5YyKAN9QZ0e2ofpy0rGKlz9jBrw==}
+
+  '@fontsource/ibm-plex-mono@5.2.7':
+    resolution: {integrity: sha512-MKAb8qV+CaiMQn2B0dIi1OV3565NYzp3WN5b4oT6LTkk+F0jR6j0ZN+5BKJiIhffDC3rtBULsYZE65+0018z9w==}
+
+  '@fontsource/ibm-plex-sans@5.2.8':
+    resolution: {integrity: sha512-eztSXjDhPhcpxNIiGTgMebdLP9qS4rWkysuE1V7c+DjOR0qiezaiDaTwQE7bTnG5HxAY/8M43XKDvs3cYq6ZYQ==}
+
+  '@fontsource/inter@5.2.8':
+    resolution: {integrity: sha512-P6r5WnJoKiNVV+zvW2xM13gNdFhAEpQ9dQJHt3naLvfg+LkF2ldgSLiF4T41lf1SQCM9QmkqPTn4TH568IRagg==}
+
+  '@fontsource/jetbrains-mono@5.2.8':
+    resolution: {integrity: sha512-6w8/SG4kqvIMu7xd7wt6x3idn1Qux3p9N62s6G3rfldOUYHpWcc2FKrqf+Vo44jRvqWj2oAtTHrZXEP23oSKwQ==}
+
+  '@fontsource/lato@5.2.7':
+    resolution: {integrity: sha512-k5mum1ADbDW5cTw1Ett1eQVWeoZ6gq0ct6SFBibEhB4LRxhniChJZTBgd6ph5yBxLkN1fcnsnmicBNA4S/3nbw==}
+
+  '@fontsource/lora@5.2.8':
+    resolution: {integrity: sha512-AQlfsHw4TP1x/eb2IZ6VjQ70ctKa39m9JN9A4zlvDOeKYLrCs+GaYIEQ86Y6YfSPGHn01bErXkRcyktOW0LOPQ==}
+
+  '@fontsource/merriweather@5.2.11':
+    resolution: {integrity: sha512-ZiIMeUh5iT8d73o6xlSF8GKgjV5pgiFrufYc5jZTVAfExtWKqM2vQHnsqXSFMv4ELhAcjt6Vf+5T3oVGXhAizQ==}
+
+  '@fontsource/open-sans@5.2.7':
+    resolution: {integrity: sha512-8yfgDYjE5O0vmTPdrcjV35y4yMnctsokmi9gN49Gcsr0sjzkMkR97AnKDe6OqZh2SFkYlR28fxOvi21bYEgMSw==}
+
+  '@fontsource/source-sans-3@5.2.9':
+    resolution: {integrity: sha512-u3ymIq4rfmCCyB9MEw/sFR5lPVJ1yTNXmIMbUz+9kVCFIHvNtfzXOEBuvkg3Tk0zhmioPeJ28ZK5smZ7TurezQ==}
+
+  '@fontsource/source-serif-4@5.2.9':
+    resolution: {integrity: sha512-er/Pym9emsEVJNf947umJ4kXarXfsiN6CN7kTYinefKRaHLwiquiiHOZvKvxWgkV8JMCf3pV3g0NcsPFpVCH9w==}
 
   '@hookform/resolvers@3.10.0':
     resolution: {integrity: sha512-79Dv+3mDF7i+2ajj7SkypSKHhl1cbln1OGavqrsF7p6mbUv11xpqpacPsGDCTRvCSjEEIez2ef1NveSVL3b0Ag==}
@@ -1737,11 +1815,20 @@ packages:
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
+  '@types/linkify-it@3.0.5':
+    resolution: {integrity: sha512-yg6E+u0/+Zjva+buc3EIb+29XEg4wltq7cSmd4Uc2EE/1nUVmxyzpX6gUXD0V8jIrG0r7YeOGVIbYRkxeooCtw==}
+
   '@types/linkify-it@5.0.0':
     resolution: {integrity: sha512-sVDA58zAw4eWAffKOaQH5/5j3XeayukzDk+ewSsnv3p4yJEZHCCzMDiZM8e0OUrRvmpGZ85jf4yDHkHsgBNr9Q==}
 
+  '@types/markdown-it@13.0.9':
+    resolution: {integrity: sha512-1XPwR0+MgXLWfTn9gCsZ55AHOKW1WN+P9vr0PaQh5aerR9LLQXUbjfEAFhjmEmyoYFWAyuN2Mqkn40MZ4ukjBw==}
+
   '@types/markdown-it@14.1.2':
     resolution: {integrity: sha512-promo4eFwuiW+TfGxhi+0x3czqTYJkG8qB17ZUJiVF10Xm7NLVRSLUsfRTU/6h1e24VvRnXCx+hG7li58lkzog==}
+
+  '@types/mdurl@1.0.5':
+    resolution: {integrity: sha512-6L6VymKTzYSrEf4Nev4Xa1LCHKrlTlYCBMTlQKFuddo1CvQcE52I0mwfOJayueUC7MJuXOeHTcIU683lzd0cUA==}
 
   '@types/mdurl@2.0.0':
     resolution: {integrity: sha512-RGdgjQUZba5p6QEFAVx2OGb8rQDL/cPRG7GiedRzMcJ1tYnUANBncjbSB1NRGwbvjcPeikRABz2nshyPk1bhWg==}
@@ -2155,6 +2242,9 @@ packages:
   data-view-byte-offset@1.0.1:
     resolution: {integrity: sha512-BS8PfmtDGnrgYdOonGZQdLZslWIeCGFP9tpan0hi1Co2Zr2NKADsvGYA8XxuG/4UWgJ6Cjtv+YJnB6MM69QGlQ==}
     engines: {node: '>= 0.4'}
+
+  date-fns@4.4.0:
+    resolution: {integrity: sha512-+1UMbeh68lH1SegH83CGWwpb6OHHbpSgr3+s5Eww5M4CAgswBpoWS0AjTOfEJ33HiYKz1hdj/KTFprzXHmq/6w==}
 
   debug@4.4.3:
     resolution: {integrity: sha512-RGwwWnwQvkVfavKVt22FGLw+xYSdzARwm0ru6DhTVA3umU5hZc28V3kO4stgYryrTlLpuvgI9GiijltAjNbcqA==}
@@ -2916,6 +3006,9 @@ packages:
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
 
+  markdown-it-task-lists@2.1.1:
+    resolution: {integrity: sha512-TxFAc76Jnhb2OUu+n3yz9RMu4CwGfaT788br6HhEDlvWfdeJcLUsxk1Hgw2yJio0OXsxv7pyIPmvECY7bMbluA==}
+
   markdown-it@14.2.0:
     resolution: {integrity: sha512-1TGiQiJVRQ3NPmZH6sx5Cfnmg6GQm9jvC1ch4TK511NjSJvjzKLzn5pPfZRNZkRPZP0HqCioSndqH8v2nRaWVQ==}
     hasBin: true
@@ -3217,6 +3310,16 @@ packages:
 
   queue@6.0.2:
     resolution: {integrity: sha512-iHZWu+q3IdFZFX36ro/lKBkSvfkztY5Y7HMiPlOUjhupPcG2JMfst2KKEpu5XndviX/3UhFbRngUPNKtgvtZiA==}
+
+  react-day-picker@10.0.1:
+    resolution: {integrity: sha512-eNh6BlwcYInWaJtRv18mXQ06Ys/H6rdTZAnTaSdOYJuTpwP1JMCHNd1FDRadA+gbeinq+psdULN5Xnowy9mV8w==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@types/react': '>=16.8.0'
+      react: '>=16.8.0'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
 
   react-dom@19.2.7:
     resolution: {integrity: sha512-t0BRVXvbiE/o20Hfw669rLbMCDWtYZLvmJigy2f0MxsXF+71pxhR3xOkspmsO8h3ZlNzyibAmtCa3l4lYKk6gQ==}
@@ -3537,6 +3640,11 @@ packages:
 
   tippy.js@6.3.7:
     resolution: {integrity: sha512-E1d3oP2emgJ9dRQZdf3Kkn0qJgI6ZLpyS5z6ZkY1DF3kaQaBsGZsndEpHwx+eC+tYM41HaSNvNtLx8tU57FzTQ==}
+
+  tiptap-markdown@0.9.0:
+    resolution: {integrity: sha512-dKLQ9iiuGNgrlGVjrNauF/UBzWu4LYOx5pkD0jNkmQt/GOwfCJsBuzZTsf1jZ204ANHOm572mZ9PYvGh1S7tpQ==}
+    peerDependencies:
+      '@tiptap/core': ^3.0.1
 
   totalist@3.0.1:
     resolution: {integrity: sha512-sf4i37nQ2LBx4m3wB74y+ubopq6W/dIzXg0FDGjsYnZHVa1Da8FH853wlL2gtUhg+xJXjfk3kUZS3BRoQeoQBQ==}
@@ -4585,6 +4693,8 @@ snapshots:
       '@babel/helper-string-parser': 7.29.7
       '@babel/helper-validator-identifier': 7.29.7
 
+  '@date-fns/tz@1.5.0': {}
+
   '@dnd-kit/accessibility@3.1.1(react@19.2.7)':
     dependencies:
       react: 19.2.7
@@ -4739,6 +4849,28 @@ snapshots:
   '@fontsource-variable/geist-mono@5.2.8': {}
 
   '@fontsource-variable/vollkorn@5.2.10': {}
+
+  '@fontsource/eb-garamond@5.2.7': {}
+
+  '@fontsource/ibm-plex-mono@5.2.7': {}
+
+  '@fontsource/ibm-plex-sans@5.2.8': {}
+
+  '@fontsource/inter@5.2.8': {}
+
+  '@fontsource/jetbrains-mono@5.2.8': {}
+
+  '@fontsource/lato@5.2.7': {}
+
+  '@fontsource/lora@5.2.8': {}
+
+  '@fontsource/merriweather@5.2.11': {}
+
+  '@fontsource/open-sans@5.2.7': {}
+
+  '@fontsource/source-sans-3@5.2.9': {}
+
+  '@fontsource/source-serif-4@5.2.9': {}
 
   '@hookform/resolvers@3.10.0(react-hook-form@7.77.0(react@19.2.7))':
     dependencies:
@@ -5500,12 +5632,21 @@ snapshots:
 
   '@types/json-schema@7.0.15': {}
 
+  '@types/linkify-it@3.0.5': {}
+
   '@types/linkify-it@5.0.0': {}
+
+  '@types/markdown-it@13.0.9':
+    dependencies:
+      '@types/linkify-it': 3.0.5
+      '@types/mdurl': 1.0.5
 
   '@types/markdown-it@14.1.2':
     dependencies:
       '@types/linkify-it': 5.0.0
       '@types/mdurl': 2.0.0
+
+  '@types/mdurl@1.0.5': {}
 
   '@types/mdurl@2.0.0': {}
 
@@ -6002,6 +6143,8 @@ snapshots:
       call-bound: 1.0.4
       es-errors: 1.3.0
       is-data-view: 1.0.2
+
+  date-fns@4.4.0: {}
 
   debug@4.4.3:
     dependencies:
@@ -6829,6 +6972,8 @@ snapshots:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
 
+  markdown-it-task-lists@2.1.1: {}
+
   markdown-it@14.2.0:
     dependencies:
       argparse: 2.0.1
@@ -7154,6 +7299,14 @@ snapshots:
   queue@6.0.2:
     dependencies:
       inherits: 2.0.4
+
+  react-day-picker@10.0.1(@types/react@19.2.17)(react@19.2.7):
+    dependencies:
+      '@date-fns/tz': 1.5.0
+      date-fns: 4.4.0
+      react: 19.2.7
+    optionalDependencies:
+      '@types/react': 19.2.17
 
   react-dom@19.2.7(react@19.2.7):
     dependencies:
@@ -7530,6 +7683,14 @@ snapshots:
   tippy.js@6.3.7:
     dependencies:
       '@popperjs/core': 2.11.8
+
+  tiptap-markdown@0.9.0(@tiptap/core@2.27.2(@tiptap/pm@2.27.2)):
+    dependencies:
+      '@tiptap/core': 2.27.2(@tiptap/pm@2.27.2)
+      '@types/markdown-it': 13.0.9
+      markdown-it: 14.2.0
+      markdown-it-task-lists: 2.1.1
+      prosemirror-markdown: 1.13.4
 
   totalist@3.0.1: {}
 

@@ -2,7 +2,7 @@ import { type FC } from 'react';
 import { m } from 'motion/react';
 import ResumePreview from '@/components/ResumePreview/ResumePreview';
 import { cn } from '@/lib/cn';
-import { tileNumberVariants, easeOutExpo } from '@/constants';
+import { tileNumberVariants, galleryTileVariants, easeOutExpo } from '@/constants';
 import type { ResumeVariant } from '@/types/resume-variant-type';
 
 interface ITemplateTileProps {
@@ -14,90 +14,95 @@ interface ITemplateTileProps {
 
 const TemplateTile: FC<ITemplateTileProps> = ({ variant, name, caption, index }) => {
   return (
-    <m.a
-      href={`/templates/${variant}`}
-      className="group block focus-visible:outline-none"
-      initial="rest"
-      whileHover="hover"
-      whileFocus="hover"
+    <m.div
+      variants={galleryTileVariants}
+      style={{ willChange: 'transform, opacity' }}
     >
-      <div className="flex items-baseline justify-between gap-4 mb-5">
-        <m.span
-          className="font-display italic font-normal text-faint tabular-nums"
-          style={{
-            fontSize: 'clamp(1.5rem, 2vw, 2rem)',
-            lineHeight: '1',
-            letterSpacing: '-0.015em',
-            willChange: 'transform',
-          }}
-          variants={tileNumberVariants}
-          aria-hidden
-        >
-          {String(index).padStart(2, '0')}
-        </m.span>
-        <span className="font-mono text-2xs uppercase tracking-[0.2em] text-muted">
-          {variant.replace('-', ' · ')}
-        </span>
-      </div>
-
-      <m.div
-        className={cn(
-          'relative overflow-hidden rounded-canvas bg-surface-sunk',
-          'shadow-2 group-hover:shadow-3 transition-shadow duration-base ease-out-quart',
-          'group-focus-visible:ring-2 group-focus-visible:ring-accent group-focus-visible:ring-offset-2',
-        )}
-        style={{
-          aspectRatio: '8.5 / 11',
-          outline: '1px solid oklch(1 0 0 / 0.04)',
-          outlineOffset: '-1px',
-        }}
+      <m.a
+        href={`/templates/${variant}`}
+        className="group block focus-visible:outline-none"
+        initial="rest"
+        whileHover="hover"
+        whileFocus="hover"
       >
-        <m.div
-          aria-hidden
-          className="absolute inset-0 origin-center"
-          style={{
-            transform: 'scale(0.85)',
-            width: '117.6%',
-            height: '117.6%',
-            transformOrigin: 'center center',
-            willChange: 'transform',
-          }}
-          variants={{
-            rest: { scale: 0.85 },
-            hover: {
-              scale: 0.88,
-              transition: { duration: 0.55, ease: easeOutExpo },
-            },
-          }}
-        >
-          <ResumePreview variant={variant} />
-        </m.div>
-      </m.div>
+        <div className="flex items-baseline justify-between gap-4 mb-5">
+          <m.span
+            className="font-display italic font-normal text-faint tabular-nums"
+            style={{
+              fontSize: 'clamp(1.5rem, 2vw, 2rem)',
+              lineHeight: '1',
+              letterSpacing: '-0.015em',
+              willChange: 'transform',
+            }}
+            variants={tileNumberVariants}
+            aria-hidden
+          >
+            {String(index).padStart(2, '0')}
+          </m.span>
+          <span className="font-mono text-2xs uppercase tracking-[0.2em] text-muted">
+            {variant.replace('-', ' · ')}
+          </span>
+        </div>
 
-      <div className="mt-6 flex flex-col gap-2.5">
-        <h3
-          className="font-display font-medium text-ink transition-colors duration-base ease-out-quart group-hover:text-accent-ink dark:group-hover:text-accent"
+        <m.div
+          className={cn(
+            'relative overflow-hidden rounded-canvas bg-surface-sunk',
+            'shadow-2 group-hover:shadow-3 transition-shadow duration-base ease-out-quart',
+            'group-focus-visible:ring-2 group-focus-visible:ring-accent group-focus-visible:ring-offset-2',
+          )}
           style={{
-            fontSize: 'clamp(1.75rem, 2.6vw, 2.25rem)',
-            lineHeight: '1.05',
-            letterSpacing: '-0.022em',
+            aspectRatio: '8.5 / 11',
+            outline: '1px solid oklch(1 0 0 / 0.04)',
+            outlineOffset: '-1px',
           }}
         >
-          {name}
-        </h3>
-        <p
-          className="font-sans text-ink-soft text-pretty"
-          style={{
-            fontSize: '1.0625rem',
-            lineHeight: '1.5',
-            maxWidth: '42ch',
-            fontVariationSettings: '"wdth" 96',
-          }}
-        >
-          {caption}
-        </p>
-      </div>
-    </m.a>
+          <m.div
+            aria-hidden
+            className="absolute inset-0 origin-center"
+            style={{
+              transform: 'scale(0.85)',
+              width: '117.6%',
+              height: '117.6%',
+              transformOrigin: 'center center',
+              willChange: 'transform',
+            }}
+            variants={{
+              rest: { scale: 0.85 },
+              hover: {
+                scale: 0.88,
+                transition: { duration: 0.55, ease: easeOutExpo },
+              },
+            }}
+          >
+            <ResumePreview variant={variant} />
+          </m.div>
+        </m.div>
+
+        <div className="mt-6 flex flex-col gap-2.5">
+          <h3
+            className="font-display font-medium text-ink transition-colors duration-base ease-out-quart group-hover:text-accent-ink dark:group-hover:text-accent"
+            style={{
+              fontSize: 'clamp(1.75rem, 2.6vw, 2.25rem)',
+              lineHeight: '1.05',
+              letterSpacing: '-0.022em',
+            }}
+          >
+            {name}
+          </h3>
+          <p
+            className="font-sans text-ink-soft text-pretty"
+            style={{
+              fontSize: '1.0625rem',
+              lineHeight: '1.5',
+              maxWidth: '42ch',
+              fontVariationSettings: '"wdth" 96',
+            }}
+          >
+            {caption}
+          </p>
+        </div>
+      </m.a>
+    </m.div>
   );
 };
 
