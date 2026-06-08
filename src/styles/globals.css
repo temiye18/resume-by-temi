@@ -165,7 +165,6 @@
   html {
     -webkit-text-size-adjust: 100%;
     font-feature-settings: 'cv05', 'ss01';
-    scroll-behavior: smooth;
     scroll-padding-top: 5rem;
   }
 
@@ -359,9 +358,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto !important;
-  }
   *,
   *::before,
   *::after {
