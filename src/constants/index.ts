@@ -6,6 +6,10 @@ export { editorSidebarTabs, editorSectionSummaries } from './editor-preview-mock
 export { atsExtractedLines, atsVerifiedItems } from './ats-comparison-content';
 export { resumeVariantStyles } from './resume-variant-styles';
 export { fontCatalog } from './font-catalog';
+export { aiScanFields } from './ai-scan-fields';
+export { aiScanTextLines } from './ai-scan-text-lines';
+export { aiTokenStreamSequence } from './ai-token-stream-sequence';
+export { aiParseSteps } from './ai-parse-steps';
 export {
   heroHeadlineParts,
   heroTypewriterCharMs,

@@ -40,6 +40,127 @@ let content = '';
 if (toolName === 'Write') content = toolInput.content || '';
 else if (toolName === 'Edit') content = toolInput.new_string || '';
 else if (toolName === 'MultiEdit') content = (toolInput.edits || []).map((e) => e.new_string || '').join('\n');
+
+// ---- shared helpers (used by inline_data_collection + over-extraction rules) ----
+
+function escapeRegex(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Walk forward from an opening bracket and count its top-level items.
+// Honours nested brackets, strings (with escapes), and // and /* */ comments.
+function countTopLevelItems(src, openIdx, openChar) {
+  const PAIR = { '[': ']', '{': '}', '(': ')' };
+  const closeChar = PAIR[openChar];
+  let depth = 1;
+  let inString = null;
+  let inComment = null;
+  let commas = 0;
+  let hasContent = false;
+  for (let i = openIdx + 1; i < src.length; i += 1) {
+    const ch = src[i];
+    const next = src[i + 1];
+    if (inComment === '/') {
+      if (ch === '\n') inComment = null;
+      continue;
+    }
+    if (inComment === '*') {
+      if (ch === '*' && next === '/') {
+        inComment = null;
+        i += 1;
+      }
+      continue;
+    }
+    if (inString) {
+      if (ch === '\\') {
+        i += 1;
+        continue;
+      }
+      if (ch === inString) inString = null;
+      continue;
+    }
+    if (ch === '/' && next === '/') {
+      inComment = '/';
+      i += 1;
+      continue;
+    }
+    if (ch === '/' && next === '*') {
+      inComment = '*';
+      i += 1;
+      continue;
+    }
+    if (ch === '"' || ch === "'" || ch === '`') {
+      inString = ch;
+      hasContent = true;
+      continue;
+    }
+    if (ch === '[' || ch === '{' || ch === '(') {
+      depth += 1;
+      hasContent = true;
+      continue;
+    }
+    if (ch === ']' || ch === '}' || ch === ')') {
+      depth -= 1;
+      if (depth === 0 && ch === closeChar) {
+        return hasContent ? commas + 1 : 0;
+      }
+      continue;
+    }
+    if (ch === ',' && depth === 1) {
+      commas += 1;
+      continue;
+    }
+    if (!/\s/.test(ch)) hasContent = true;
+  }
+  return 0;
+}
+
+function findProjectRoot(startFile) {
+  let dir = path.dirname(startFile);
+  for (let i = 0; i < 12; i += 1) {
+    if (fs.existsSync(path.join(dir, 'package.json'))) return dir;
+    const parent = path.dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return null;
+}
+
+function countImporters(importPath) {
+  const root = findProjectRoot(filePath);
+  if (!root) return 0;
+  const srcDir = path.join(root, 'src');
+  if (!fs.existsSync(srcDir)) return 0;
+  const re = new RegExp(`from\\s+['"]${escapeRegex(importPath)}['"]`);
+  const selfPath = path.resolve(filePath);
+  let count = 0;
+  const skipDirs = new Set(['node_modules', 'dist', 'coverage', 'playwright-report', '.tmp-shots', 'build']);
+  const walk = (dir) => {
+    let entries = [];
+    try {
+      entries = fs.readdirSync(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const entry of entries) {
+      if (entry.isDirectory()) {
+        if (skipDirs.has(entry.name)) continue;
+        walk(path.join(dir, entry.name));
+        continue;
+      }
+      if (!/\.(ts|tsx)$/.test(entry.name)) continue;
+      const full = path.join(dir, entry.name);
+      if (path.resolve(full) === selfPath) continue;
+      try {
+        if (re.test(fs.readFileSync(full, 'utf8'))) count += 1;
+      } catch {
+        /* read failure is non-fatal */
+      }
+    }
+  };
+  walk(srcDir);
+  return count;
+}
 if (!content) process.exit(0);
 
 const sessionId = input.session_id || 'default';
@@ -698,6 +819,102 @@ so siblings can import it without coupling to this component (CLAUDE.md
 
   // DO — in src/types/status-type.ts
   export type Status = 'idle' | 'busy' | 'done';`,
+  },
+
+  {
+    name: 'inline_data_collection',
+    when: () => {
+      if (!isReactSrc) return false;
+      if (isTest || isConfig) return false;
+      // Find top-level const FOO = [ ... ]  or  const FOO = { ... }
+      // (allows optional type annotation, accepts any const name).
+      const declRe = /^(?:export\s+)?const\s+\w+(?:\s*:\s*[^=]+)?\s*=\s*([\[\{])/gm;
+      let m;
+      while ((m = declRe.exec(content)) !== null) {
+        const openIdx = m.index + m[0].length - 1;
+        const items = countTopLevelItems(content, openIdx, m[1]);
+        if (items >= 4) return true;
+      }
+      return false;
+    },
+    msg: `Large data collection (4+ items) declared inline in a .tsx component file.
+Per CLAUDE.md, all "dummy data," fixtures, sample collections, configuration
+arrays, and option lists live in 'src/constants/<domain>.ts' and are imported
+via '@/constants'. Component files contain components, not data.
+
+  // DON'T — in Foo.tsx
+  const TABS = [
+    { key: 'a', label: 'Alpha' },
+    { key: 'b', label: 'Beta' },
+    { key: 'c', label: 'Gamma' },
+    { key: 'd', label: 'Delta' },
+  ];
+
+  // DO — in src/constants/foo-tabs.ts
+  export const fooTabs = [ … ];
+
+  // …and in Foo.tsx
+  import { fooTabs } from '@/constants';
+
+Small (<4 item) lists and primitive constants can stay inline.`,
+  },
+
+  {
+    name: 'interface_over_extraction',
+    when: () => {
+      if (!isInterfaceFile) return false;
+      // Only fire on Write (new file). Editing an existing file is usually
+      // a refactor; we don't want to nag on every save.
+      if (toolName !== 'Write') return false;
+      const match = filePath.match(/\/src\/(interfaces\/i-[a-z0-9-]+)\.ts$/);
+      if (!match) return false;
+      const importPath = `@/${match[1]}`;
+      return countImporters(importPath) < 2;
+    },
+    msg: `New 'src/interfaces/i-*.ts' file has fewer than 2 importers — the shape is
+unique to a single consumer and should stay inline.
+
+CLAUDE.md "Types and interfaces" — the shared or scoped nuance:
+  - A type/interface used in ONE place stays inline in that file. The Props
+    interface is the canonical example, but the rule generalises: any local
+    helper interface that no sibling needs lives where it's used.
+  - Promote to 'src/interfaces/' the moment a SECOND file needs the same
+    shape. Until then, the redirection adds noise.
+
+  // DON'T — for a one-component shape
+  // src/interfaces/i-row.ts  (only imported by FooTable.tsx)
+  export interface IRow { … }
+
+  // DO — inline in the consumer
+  // FooTable.tsx
+  interface IRow { … }   // non-exported, local`,
+  },
+
+  {
+    name: 'type_over_extraction',
+    when: () => {
+      if (!isTypeFile) return false;
+      if (toolName !== 'Write') return false;
+      const match = filePath.match(/\/src\/(types\/[a-z0-9-]+-type)\.ts$/);
+      if (!match) return false;
+      const importPath = `@/${match[1]}`;
+      return countImporters(importPath) < 2;
+    },
+    msg: `New 'src/types/*-type.ts' file has fewer than 2 importers — the type is
+unique to a single consumer and should stay inline.
+
+CLAUDE.md "Types and interfaces" — the shared or scoped nuance:
+  - Move to 'src/types/' once a SECOND file needs the same union/alias.
+  - Until then, declare it inline in the single consumer file. The extra file
+    adds an import indirection with no payoff.
+
+  // DON'T — for a single-consumer union
+  // src/types/foo-status-type.ts  (only imported by Foo.tsx)
+  export type FooStatus = 'idle' | 'busy' | 'done';
+
+  // DO — inline in the consumer
+  // Foo.tsx (top of file)
+  type FooStatus = 'idle' | 'busy' | 'done';   // local`,
   },
 
   // ============================================================

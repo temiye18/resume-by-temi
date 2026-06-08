@@ -13,7 +13,8 @@ import { emptyResume, ResumeSchema } from '@/schema/resume';
 import { timeOfDayGreeting, extractResumeText, parseResumeText } from '@/helpers';
 import { cn } from '@/lib/cn';
 import ResumeCard from './ResumeCard';
-import AiParseLoader, { type AiParseStage } from '@/components/AiParseLoader/AiParseLoader';
+import AiParseLoader from '@/components/AiParseLoader/AiParseLoader';
+import type { AiParseStage } from '@/types/ai-parse-stage-type';
 
 const Dashboard: FC = () => {
   const navigate = useNavigate();
