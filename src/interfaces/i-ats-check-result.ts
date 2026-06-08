@@ -8,6 +8,7 @@ export interface IAtsFinding {
 
 export interface IAtsCheckResult {
   passed: boolean;
+  score: number;
   findings: IAtsFinding[];
   meta: {
     sections: number;

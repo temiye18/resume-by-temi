@@ -46,4 +46,4 @@ pnpm build           # production build → dist/
 
 ## Project Status
 
-Pre-implementation. Architecture and product specs complete; awaiting planning decisions before code starts.
+**v1.0 in active development.** The editor product is shipping: dashboard at `/app`, editor at `/editor/$resumeId` with sections/template/theme/export tabs, autosave to IndexedDB, undo/redo, Tiptap-based bullet RTE with markdown round-trip, 6 templates (Modern Minimal, Classic Serif, Tech Sans, Executive, Compact, Editorial), vector-PDF + DOCX + JSON Resume export, clickable PDF contact links, custom MonthPicker, and a 24-rule ATS check with numeric scoring (0–100), JD keyword matching, and a ~510-entry canonical skill taxonomy. See [ROADMAP.md](./ROADMAP.md) for what's left before public launch.

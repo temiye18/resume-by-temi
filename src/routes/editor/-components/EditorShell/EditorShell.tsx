@@ -42,6 +42,7 @@ const EditorShell: FC<IEditorShellProps> = ({ resumeId }) => {
   const [atsBusy, setAtsBusy] = useState(false);
   const [atsResult, setAtsResult] = useState<IAtsCheckResult | null>(null);
   const [atsOpen, setAtsOpen] = useState(false);
+  const [jobDescription, setJobDescription] = useState('');
 
   useEffect(() => {
     let cancelled = false;
@@ -99,7 +100,7 @@ const EditorShell: FC<IEditorShellProps> = ({ resumeId }) => {
     setAtsResult(null);
     try {
       const blob = await generatePdf({ resume, templateId, theme });
-      const result = await atsCheck(blob, resume);
+      const result = await atsCheck(blob, resume, { jobDescription });
       setAtsResult(result);
     } finally {
       setAtsBusy(false);
@@ -143,6 +144,8 @@ const EditorShell: FC<IEditorShellProps> = ({ resumeId }) => {
           onDownloadDocx={handleDownloadDocx}
           onDownloadJson={handleDownloadJson}
           onAtsCheck={handleAtsCheck}
+          jobDescription={jobDescription}
+          onChangeJobDescription={setJobDescription}
           pdfBusy={pdfBusy}
           docxBusy={docxBusy}
           atsBusy={atsBusy}

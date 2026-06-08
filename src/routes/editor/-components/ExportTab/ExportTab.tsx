@@ -1,4 +1,4 @@
-import { type FC } from 'react';
+import { type FC, type ChangeEvent } from 'react';
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
   Download04Icon,
@@ -12,6 +12,8 @@ interface IExportTabProps {
   onDownloadDocx: () => void;
   onDownloadJson: () => void;
   onAtsCheck: () => void;
+  jobDescription: string;
+  onChangeJobDescription: (next: string) => void;
   pdfBusy?: boolean;
   docxBusy?: boolean;
   atsBusy?: boolean;
@@ -22,6 +24,8 @@ const ExportTab: FC<IExportTabProps> = ({
   onDownloadDocx,
   onDownloadJson,
   onAtsCheck,
+  jobDescription,
+  onChangeJobDescription,
   pdfBusy,
   docxBusy,
   atsBusy,
@@ -57,11 +61,23 @@ const ExportTab: FC<IExportTabProps> = ({
         <h3 className="font-mono text-2xs uppercase tracking-[0.16em] text-muted">Verify</h3>
         <ExportButton
           label="Check ATS compatibility"
-          subtitle="Generates the PDF, extracts text, validates the R1–R9 rules."
+          subtitle="Round-trips every field, scores against R1–R22, optionally matches a JD."
           icon={ShieldUserIcon}
           onClick={onAtsCheck}
           busy={atsBusy}
         />
+        <label className="flex flex-col gap-1.5">
+          <span className="font-mono text-2xs uppercase tracking-[0.16em] text-muted">
+            Job description <span className="text-faint normal-case tracking-normal">(optional, paste to score keyword overlap)</span>
+          </span>
+          <textarea
+            value={jobDescription}
+            onChange={(e: ChangeEvent<HTMLTextAreaElement>) => onChangeJobDescription(e.target.value)}
+            placeholder="Paste a job description here to score your resume's keyword coverage against it."
+            rows={6}
+            className="rounded-sm border border-border bg-bg px-2.5 py-2 font-sans text-sm text-ink placeholder:text-muted focus:border-accent focus:outline-none transition-colors duration-fast ease-out-quart scrollbar-slim resize-none"
+          />
+        </label>
       </section>
     </div>
   );

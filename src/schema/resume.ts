@@ -224,8 +224,8 @@ export const emptyResume = (): Resume => ({
     },
   ],
   skills: [
-    { id: nanoid(), name: 'Languages', keywords: ['TypeScript', 'Python', 'Go'] },
-    { id: nanoid(), name: 'Frameworks', keywords: ['React', 'Node.js'] },
+    { id: nanoid(), name: 'Programming Languages', keywords: ['TypeScript', 'Python', 'Go'] },
+    { id: nanoid(), name: 'Frameworks & Tools', keywords: ['React', 'Node.js'] },
   ],
   projects: [],
   certificates: [],
