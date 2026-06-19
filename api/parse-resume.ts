@@ -1,4 +1,4 @@
-import { parseResumeViaGemini } from '../server/gemini-parse';
+import { parseResumeViaGemini } from '../server/gemini-parse.js';
 
 interface IVercelRequest {
   method?: string;
