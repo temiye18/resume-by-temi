@@ -105,6 +105,9 @@ const ResumeDocument: FC<IResumeDocumentProps> = ({ resume, templateId, theme, t
                     <Text>
                       <Text style={style.entryRole}>{entry.position}</Text>
                       <Text style={style.entryCompany}>{' · '}{entry.name}</Text>
+                      {entry.location ? (
+                        <Text style={style.entryCompany}>{' · '}{entry.location}</Text>
+                      ) : null}
                     </Text>
                     <Text style={style.entryDates}>
                       {formatPdfDateRange(entry.startDate, entry.endDate)}

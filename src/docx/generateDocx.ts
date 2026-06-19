@@ -101,18 +101,22 @@ export const generateDocx = async (resume: Resume): Promise<Blob> => {
   if (resume.work.length > 0) {
     children.push(sectionHeading('Experience'));
     for (const entry of resume.work) {
+      const headerRuns = [
+        text(entry.position, { bold: true }),
+        text(' · '),
+        text(entry.name, { color: COLOR_MUTED }),
+      ];
+      if (entry.location) {
+        headerRuns.push(text(' · '), text(entry.location, { color: COLOR_MUTED }));
+      }
+      headerRuns.push(
+        text('  '),
+        text(formatPdfDateRange(entry.startDate, entry.endDate), { color: COLOR_MUTED }),
+      );
       children.push(
         new Paragraph({
           spacing: { before: 80, after: 40 },
-          children: [
-            text(entry.position, { bold: true }),
-            text(' · '),
-            text(entry.name, { color: COLOR_MUTED }),
-            text('  '),
-            text(formatPdfDateRange(entry.startDate, entry.endDate), {
-              color: COLOR_MUTED,
-            }),
-          ],
+          children: headerRuns,
         }),
       );
       for (const h of entry.highlights) {

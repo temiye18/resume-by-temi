@@ -167,6 +167,22 @@ const SectionHeading: FC<{ children: React.ReactNode }> = ({ children }) => (
   <h3 className="font-mono text-2xs uppercase tracking-[0.2em] text-muted">{children}</h3>
 );
 
+interface IAddRowButtonProps {
+  label: string;
+  onClick: () => void;
+}
+
+const AddRowButton: FC<IAddRowButtonProps> = ({ label, onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className="inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-sm border border-dashed border-border text-xs text-muted transition-colors duration-fast ease-out-quart hover:border-border-strong hover:text-ink-soft"
+  >
+    <HugeiconsIcon icon={PlusSignIcon} size={12} strokeWidth={1.5} />
+    {label}
+  </button>
+);
+
 const moveArrayItem = <T,>(arr: T[], from: number, to: number): T[] => {
   if (to < 0 || to >= arr.length) return arr;
   const next = arr.slice();
@@ -455,6 +471,24 @@ const SectionsTab: FC = () => {
             </Disclosure>
           ))}
         </div>
+        {resume.work.length > 0 ? (
+          <AddRowButton
+            label="Add experience"
+            onClick={() =>
+              patchResume((d) => {
+                d.work.push({
+                  id: newId(),
+                  name: 'Company',
+                  position: 'Title',
+                  startDate: '2025-01',
+                  endDate: 'Present',
+                  location: '',
+                  highlights: [],
+                });
+              })
+            }
+          />
+        ) : null}
       </section>
 
       {/* Projects */}
@@ -521,7 +555,9 @@ const SectionsTab: FC = () => {
               <Field
                 label="Description"
                 value={entry.description ?? ''}
-                placeholder="One-line tagline (e.g. real-time markdown editor)"
+                placeholder="What the project is, who it's for, and how it works"
+                multiline
+                rows={3}
                 onChange={(v) =>
                   patchResume((d) => {
                     d.projects[i].description = v;
@@ -586,6 +622,23 @@ const SectionsTab: FC = () => {
             </Disclosure>
           ))}
         </div>
+        {resume.projects.length > 0 ? (
+          <AddRowButton
+            label="Add project"
+            onClick={() =>
+              patchResume((d) => {
+                d.projects.push({
+                  id: newId(),
+                  name: 'Project',
+                  description: '',
+                  highlights: [],
+                  keywords: [],
+                  roles: [],
+                });
+              })
+            }
+          />
+        ) : null}
       </section>
 
       {/* Education */}
@@ -680,6 +733,24 @@ const SectionsTab: FC = () => {
             </Disclosure>
           ))}
         </div>
+        {resume.education.length > 0 ? (
+          <AddRowButton
+            label="Add education"
+            onClick={() =>
+              patchResume((d) => {
+                d.education.push({
+                  id: newId(),
+                  institution: 'School',
+                  studyType: 'Degree',
+                  area: 'Field',
+                  endDate: '',
+                  highlights: [],
+                  courses: [],
+                });
+              })
+            }
+          />
+        ) : null}
       </section>
 
       {/* Skills */}
@@ -745,6 +816,16 @@ const SectionsTab: FC = () => {
             </div>
           ))}
         </div>
+        {resume.skills.length > 0 ? (
+          <AddRowButton
+            label="Add skill group"
+            onClick={() =>
+              patchResume((d) => {
+                d.skills.push({ id: newId(), name: 'Group', keywords: [] });
+              })
+            }
+          />
+        ) : null}
       </section>
     </div>
   );

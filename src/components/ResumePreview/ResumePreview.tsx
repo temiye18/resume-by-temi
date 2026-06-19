@@ -170,6 +170,12 @@ const ResumePreview: FC<IResumePreviewProps> = ({
                 <span className={v.entryRole}>{entry.role}</span>
                 {' · '}
                 <span className={v.entryCompany}>{entry.company}</span>
+                {entry.location ? (
+                  <>
+                    {' · '}
+                    <span className={v.entryCompany}>{entry.location}</span>
+                  </>
+                ) : null}
               </div>
               <span className={v.entryDates}>
                 {formatDateRange(entry.startDate, entry.endDate)}
@@ -242,7 +248,9 @@ const ResumePreview: FC<IResumePreviewProps> = ({
                   </p>
                 ) : null}
                 {entry.description ? (
-                  <p className={cn(v.summary, 'mt-1')}>{entry.description}</p>
+                  <p className={cn(v.summary, 'mt-1 whitespace-pre-line')}>
+                    {entry.description}
+                  </p>
                 ) : null}
                 {entry.bullets.length > 0 ? (
                   <ul>
