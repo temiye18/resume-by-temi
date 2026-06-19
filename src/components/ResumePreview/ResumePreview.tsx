@@ -163,8 +163,8 @@ const ResumePreview: FC<IResumePreviewProps> = ({
 
       <section>
         <h2 className={v.sectionHeading}>Experience</h2>
-        {resume.experience.map((entry) => (
-          <div key={`${entry.company}-${entry.role}`}>
+        {resume.experience.map((entry, idx) => (
+          <div key={`work-${idx}-${entry.company}-${entry.role}`}>
             <div className={v.entryHeader}>
               <div className="flex-1 min-w-0">
                 <span className={v.entryRole}>{entry.role}</span>
@@ -200,7 +200,7 @@ const ResumePreview: FC<IResumePreviewProps> = ({
       {resume.projects && resume.projects.length > 0 ? (
         <section>
           <h2 className={v.sectionHeading}>Projects</h2>
-          {resume.projects.map((entry) => {
+          {resume.projects.map((entry, idx) => {
             const links: { url: string; label: string }[] = [];
             if (entry.url) {
               links.push({
@@ -215,7 +215,7 @@ const ResumePreview: FC<IResumePreviewProps> = ({
               });
             }
             return (
-              <div key={entry.name + entry.startDate}>
+              <div key={`project-${idx}-${entry.name}`}>
                 <div className={v.entryHeader}>
                   <span className={v.entryRole}>{entry.name}</span>
                   {entry.startDate || entry.endDate ? (
@@ -274,8 +274,8 @@ const ResumePreview: FC<IResumePreviewProps> = ({
 
       <section>
         <h2 className={v.sectionHeading}>Education</h2>
-        {resume.education.map((entry) => (
-          <div key={entry.institution} className={v.entryHeader}>
+        {resume.education.map((entry, idx) => (
+          <div key={`edu-${idx}-${entry.institution}`} className={v.entryHeader}>
             <div className="flex-1">
               <span className={v.entryRole}>{entry.institution}</span>
               {' · '}

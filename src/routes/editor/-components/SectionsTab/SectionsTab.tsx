@@ -110,35 +110,35 @@ const Disclosure: FC<IDisclosureProps> = ({
             ) : null}
           </span>
         </button>
-        <div className="flex items-center gap-0.5 opacity-0 transition-opacity duration-fast ease-out-quart group-hover:opacity-100 focus-within:opacity-100">
+        <div className="flex items-center gap-0.5">
           {onMoveUp ? (
             <button
               type="button"
               onClick={onMoveUp}
-              className="inline-flex h-6 w-6 items-center justify-center rounded-xs text-muted transition-colors duration-fast ease-out-quart hover:bg-bg hover:text-ink"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-xs text-faint transition-colors duration-fast ease-out-quart hover:bg-bg hover:text-ink focus-visible:bg-bg focus-visible:text-ink focus-visible:outline-none"
               aria-label="Move up"
             >
-              <HugeiconsIcon icon={ArrowUp01Icon} size={11} strokeWidth={1.5} />
+              <HugeiconsIcon icon={ArrowUp01Icon} size={13} strokeWidth={1.5} />
             </button>
           ) : null}
           {onMoveDown ? (
             <button
               type="button"
               onClick={onMoveDown}
-              className="inline-flex h-6 w-6 items-center justify-center rounded-xs text-muted transition-colors duration-fast ease-out-quart hover:bg-bg hover:text-ink"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-xs text-faint transition-colors duration-fast ease-out-quart hover:bg-bg hover:text-ink focus-visible:bg-bg focus-visible:text-ink focus-visible:outline-none"
               aria-label="Move down"
             >
-              <HugeiconsIcon icon={ArrowDown01Icon} size={11} strokeWidth={1.5} />
+              <HugeiconsIcon icon={ArrowDown01Icon} size={13} strokeWidth={1.5} />
             </button>
           ) : null}
           {onRemove ? (
             <button
               type="button"
               onClick={onRemove}
-              className="inline-flex h-6 w-6 items-center justify-center rounded-xs text-muted transition-colors duration-fast ease-out-quart hover:bg-danger-soft hover:text-danger"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-xs text-faint transition-colors duration-fast ease-out-quart hover:bg-danger-soft hover:text-danger focus-visible:bg-danger-soft focus-visible:text-danger focus-visible:outline-none"
               aria-label="Remove"
             >
-              <HugeiconsIcon icon={Delete02Icon} size={11} strokeWidth={1.5} />
+              <HugeiconsIcon icon={Delete02Icon} size={13} strokeWidth={1.5} />
             </button>
           ) : null}
         </div>
