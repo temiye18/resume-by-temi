@@ -1,4 +1,4 @@
-import { type FC, type ChangeEvent, type ReactNode, useEffect, useState } from 'react';
+import { type FC, type ChangeEvent, useEffect, useState } from 'react';
 import { m, AnimatePresence } from 'motion/react';
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
@@ -9,26 +9,13 @@ import {
   DragDropVerticalIcon,
   PlusSignIcon,
 } from '@hugeicons/core-free-icons';
-import {
-  DndContext,
-  type DragEndEvent,
-  KeyboardSensor,
-  PointerSensor,
-  closestCenter,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
-import {
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import { useResumeStore } from '@/store/resumeStore';
 import { newId } from '@/schema/resume';
 import { cn } from '@/lib/cn';
 import RichTextField from '@/components/RichTextField/RichTextField';
+import SortableList from '@/components/SortableList/SortableList';
+import SortableEntry from '@/components/SortableEntry/SortableEntry';
+import type { IDragHandleProps } from '@/interfaces/i-drag-handle-props';
 import BulletList from '../BulletList/BulletList';
 import { MonthPicker } from '@/ui';
 import { easeOutExpo } from '@/constants';
@@ -78,11 +65,6 @@ const Field: FC<IFieldProps> = ({
     </label>
   );
 };
-
-interface IDragHandleProps {
-  attributes: ReturnType<typeof useSortable>['attributes'];
-  listeners: ReturnType<typeof useSortable>['listeners'];
-}
 
 interface IDisclosureProps {
   title: string;
@@ -259,57 +241,6 @@ const moveArrayItem = <T,>(arr: T[], from: number, to: number): T[] => {
   return next;
 };
 
-interface ISortableEntryProps {
-  id: string;
-  children: (handle: IDragHandleProps, isDragging: boolean) => ReactNode;
-}
-
-const SortableEntry: FC<ISortableEntryProps> = ({ id, children }) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({ id });
-  return (
-    <div
-      ref={setNodeRef}
-      style={{
-        transform: CSS.Transform.toString(transform),
-        transition,
-        opacity: isDragging ? 0.6 : 1,
-        zIndex: isDragging ? 10 : undefined,
-        position: 'relative',
-      }}
-    >
-      {children({ attributes, listeners }, isDragging)}
-    </div>
-  );
-};
-
-interface ISortableListProps {
-  ids: string[];
-  onReorder: (from: number, to: number) => void;
-  children: ReactNode;
-}
-
-const SortableList: FC<ISortableListProps> = ({ ids, onReorder, children }) => {
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
-  );
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-    const from = ids.indexOf(String(active.id));
-    const to = ids.indexOf(String(over.id));
-    if (from === -1 || to === -1) return;
-    onReorder(from, to);
-  };
-  return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <SortableContext items={ids} strategy={verticalListSortingStrategy}>
-        {children}
-      </SortableContext>
-    </DndContext>
-  );
-};
 
 
 const SectionsTab: FC = () => {
@@ -939,13 +870,31 @@ const SectionsTab: FC = () => {
             Add group
           </button>
         </div>
+        <SortableList
+          ids={resume.skills.map((g) => g.id)}
+          onReorder={(from, to) =>
+            patchResume((d) => {
+              d.skills = moveArrayItem(d.skills, from, to);
+            })
+          }
+        >
         <div className="flex flex-col gap-2">
           {resume.skills.map((group, i) => (
+            <SortableEntry key={group.id} id={group.id}>
+              {(handle) => (
             <div
-              key={group.id}
               className={cn('flex flex-col gap-2 rounded-sm border border-border bg-bg p-3')}
             >
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center justify-between gap-1">
+                <button
+                  type="button"
+                  aria-label="Drag to reorder"
+                  {...handle.attributes}
+                  {...handle.listeners}
+                  className="inline-flex h-7 w-6 shrink-0 items-center justify-center rounded-xs text-faint transition-colors duration-fast ease-out-quart hover:text-ink focus-visible:text-ink focus-visible:outline-none cursor-grab active:cursor-grabbing touch-none"
+                >
+                  <HugeiconsIcon icon={DragDropVerticalIcon} size={14} strokeWidth={1.5} />
+                </button>
                 <input
                   value={group.name}
                   onChange={(e) =>
@@ -956,6 +905,34 @@ const SectionsTab: FC = () => {
                   className="flex-1 h-8 rounded-sm border border-transparent bg-transparent px-1 font-sans text-sm font-medium text-ink focus:border-border-strong focus:outline-none transition-colors duration-fast ease-out-quart"
                   placeholder="Group label"
                 />
+                {i > 0 ? (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      patchResume((d) => {
+                        d.skills = moveArrayItem(d.skills, i, i - 1);
+                      })
+                    }
+                    className="inline-flex h-7 w-7 items-center justify-center rounded-xs text-faint transition-colors duration-fast ease-out-quart hover:bg-surface hover:text-ink focus-visible:bg-surface focus-visible:text-ink focus-visible:outline-none"
+                    aria-label="Move up"
+                  >
+                    <HugeiconsIcon icon={ArrowUp01Icon} size={13} strokeWidth={1.5} />
+                  </button>
+                ) : null}
+                {i < resume.skills.length - 1 ? (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      patchResume((d) => {
+                        d.skills = moveArrayItem(d.skills, i, i + 1);
+                      })
+                    }
+                    className="inline-flex h-7 w-7 items-center justify-center rounded-xs text-faint transition-colors duration-fast ease-out-quart hover:bg-surface hover:text-ink focus-visible:bg-surface focus-visible:text-ink focus-visible:outline-none"
+                    aria-label="Move down"
+                  >
+                    <HugeiconsIcon icon={ArrowDown01Icon} size={13} strokeWidth={1.5} />
+                  </button>
+                ) : null}
                 <button
                   type="button"
                   onClick={() =>
@@ -963,10 +940,10 @@ const SectionsTab: FC = () => {
                       d.skills.splice(i, 1);
                     })
                   }
-                  className="inline-flex h-6 w-6 items-center justify-center rounded-xs text-muted hover:text-danger transition-colors duration-fast ease-out-quart"
+                  className="inline-flex h-7 w-7 items-center justify-center rounded-xs text-faint hover:bg-danger-soft hover:text-danger focus-visible:bg-danger-soft focus-visible:text-danger focus-visible:outline-none transition-colors duration-fast ease-out-quart"
                   aria-label="Remove group"
                 >
-                  <HugeiconsIcon icon={Delete02Icon} size={12} strokeWidth={1.5} />
+                  <HugeiconsIcon icon={Delete02Icon} size={13} strokeWidth={1.5} />
                 </button>
               </div>
               <SkillKeywordsField
@@ -978,8 +955,11 @@ const SectionsTab: FC = () => {
                 }
               />
             </div>
+              )}
+            </SortableEntry>
           ))}
         </div>
+        </SortableList>
         {resume.skills.length > 0 ? (
           <AddRowButton
             label="Add skill group"
