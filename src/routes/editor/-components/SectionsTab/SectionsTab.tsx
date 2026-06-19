@@ -457,6 +457,137 @@ const SectionsTab: FC = () => {
         </div>
       </section>
 
+      {/* Projects */}
+      <section className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <SectionHeading>Projects</SectionHeading>
+          <button
+            type="button"
+            onClick={() =>
+              patchResume((d) => {
+                d.projects.push({
+                  id: newId(),
+                  name: 'Project',
+                  description: '',
+                  highlights: [],
+                  keywords: [],
+                  roles: [],
+                });
+              })
+            }
+            className="inline-flex h-7 items-center gap-1.5 rounded-sm border border-dashed border-border px-2 text-xs text-muted hover:border-border-strong hover:text-ink-soft transition-colors duration-fast ease-out-quart"
+          >
+            <HugeiconsIcon icon={PlusSignIcon} size={12} strokeWidth={1.5} />
+            Add entry
+          </button>
+        </div>
+        <div className="flex flex-col gap-2">
+          {resume.projects.map((entry, i) => (
+            <Disclosure
+              key={entry.id}
+              title={entry.name || 'New project'}
+              subtitle={entry.description}
+              onRemove={() =>
+                patchResume((d) => {
+                  d.projects.splice(i, 1);
+                })
+              }
+              onMoveUp={
+                i > 0
+                  ? () =>
+                      patchResume((d) => {
+                        d.projects = moveArrayItem(d.projects, i, i - 1);
+                      })
+                  : undefined
+              }
+              onMoveDown={
+                i < resume.projects.length - 1
+                  ? () =>
+                      patchResume((d) => {
+                        d.projects = moveArrayItem(d.projects, i, i + 1);
+                      })
+                  : undefined
+              }
+            >
+              <Field
+                label="Name"
+                value={entry.name}
+                onChange={(v) =>
+                  patchResume((d) => {
+                    d.projects[i].name = v;
+                  })
+                }
+              />
+              <Field
+                label="Description"
+                value={entry.description ?? ''}
+                placeholder="One-line tagline (e.g. real-time markdown editor)"
+                onChange={(v) =>
+                  patchResume((d) => {
+                    d.projects[i].description = v;
+                  })
+                }
+              />
+              <Field
+                label="Website"
+                type="text"
+                value={entry.url ?? ''}
+                placeholder="https://project.live.com"
+                onChange={(v) =>
+                  patchResume((d) => {
+                    d.projects[i].url = v;
+                  })
+                }
+              />
+              <Field
+                label="Code repository"
+                type="text"
+                value={entry.repository ?? ''}
+                placeholder="https://github.com/you/project"
+                onChange={(v) =>
+                  patchResume((d) => {
+                    d.projects[i].repository = v;
+                  })
+                }
+              />
+              <div className="grid grid-cols-2 gap-3">
+                <MonthPicker
+                  label="Start"
+                  value={entry.startDate ?? ''}
+                  onChange={(v) =>
+                    patchResume((d) => {
+                      d.projects[i].startDate = v || undefined;
+                    })
+                  }
+                />
+                <MonthPicker
+                  label="End"
+                  value={entry.endDate ?? ''}
+                  onChange={(v) =>
+                    patchResume((d) => {
+                      d.projects[i].endDate = v || undefined;
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <SectionHeading>Bullets</SectionHeading>
+                <div className="mt-2">
+                  <BulletList
+                    bullets={entry.highlights}
+                    onChange={(next) =>
+                      patchResume((d) => {
+                        d.projects[i].highlights = next;
+                      })
+                    }
+                  />
+                </div>
+              </div>
+            </Disclosure>
+          ))}
+        </div>
+      </section>
+
       {/* Education */}
       <section className="flex flex-col gap-3">
         <div className="flex items-center justify-between">

@@ -43,5 +43,14 @@ export const resumeToFixture = (resume: Resume): IFixtureResume => {
       group: s.name,
       items: s.keywords,
     })),
+    projects: resume.projects.map((p) => ({
+      name: p.name,
+      description: p.description ?? '',
+      url: p.url ?? '',
+      repository: p.repository ?? '',
+      startDate: p.startDate ?? '',
+      endDate: p.endDate ?? '',
+      bullets: p.highlights.map((text) => ({ text })),
+    })),
   };
 };

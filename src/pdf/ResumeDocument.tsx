@@ -132,6 +132,72 @@ const ResumeDocument: FC<IResumeDocumentProps> = ({ resume, templateId, theme, t
           </View>
         ) : null}
 
+        {hasProjects && visibleSections.has('projects') ? (
+          <View>
+            <Text style={style.sectionHeading}>Projects</Text>
+            {resume.projects.map((entry) => {
+              const projectLinks: { url: string; label: string }[] = [];
+              if (entry.url) {
+                projectLinks.push({
+                  url: entry.url,
+                  label: entry.url.replace(/^https?:\/\//, '').replace(/\/$/, ''),
+                });
+              }
+              if (entry.repository) {
+                projectLinks.push({
+                  url: entry.repository,
+                  label: entry.repository.replace(/^https?:\/\//, '').replace(/\/$/, ''),
+                });
+              }
+              return (
+                <View key={entry.id} style={style.entryRow}>
+                  <View wrap={false}>
+                    <View style={style.entryHeader}>
+                      <Text style={style.entryRole}>{entry.name}</Text>
+                      <Text style={style.entryDates}>
+                        {formatPdfDateRange(entry.startDate, entry.endDate)}
+                      </Text>
+                    </View>
+                    {projectLinks.length > 0 ? (
+                      <Text style={style.entryDates}>
+                        {projectLinks.map((link, i) => (
+                          <Fragment key={link.url}>
+                            {i > 0 ? <Text>{' · '}</Text> : null}
+                            <Link
+                              src={link.url}
+                              style={{ color: 'inherit', textDecoration: 'none' }}
+                            >
+                              {link.label}
+                            </Link>
+                          </Fragment>
+                        ))}
+                      </Text>
+                    ) : null}
+                    {entry.description ? (
+                      <Text style={style.summary}>{entry.description}</Text>
+                    ) : entry.highlights[0] ? (
+                      <View style={style.bullet}>
+                        <Text>{'• '}</Text>
+                        <Text style={style.bulletText}>
+                          <MarkdownRuns source={entry.highlights[0]} accentColor={style.accentColor} />
+                        </Text>
+                      </View>
+                    ) : null}
+                  </View>
+                  {(entry.description ? entry.highlights : entry.highlights.slice(1)).map((h, i) => (
+                    <View key={i} style={style.bullet}>
+                      <Text>{'• '}</Text>
+                      <Text style={style.bulletText}>
+                        <MarkdownRuns source={h} accentColor={style.accentColor} />
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              );
+            })}
+          </View>
+        ) : null}
+
         {hasEducation && visibleSections.has('education') ? (
           <View>
             <Text style={style.sectionHeading}>Education</Text>
@@ -177,42 +243,6 @@ const ResumeDocument: FC<IResumeDocumentProps> = ({ resume, templateId, theme, t
               <View key={group.id} style={style.skillsLine}>
                 <Text style={style.skillsLabel}>{group.name}: </Text>
                 <Text style={style.skillsText}>{group.keywords.join(', ')}</Text>
-              </View>
-            ))}
-          </View>
-        ) : null}
-
-        {hasProjects && visibleSections.has('projects') ? (
-          <View>
-            <Text style={style.sectionHeading}>Projects</Text>
-            {resume.projects.map((entry) => (
-              <View key={entry.id} style={style.entryRow}>
-                <View wrap={false}>
-                  <View style={style.entryHeader}>
-                    <Text style={style.entryRole}>{entry.name}</Text>
-                    <Text style={style.entryDates}>
-                      {formatPdfDateRange(entry.startDate, entry.endDate)}
-                    </Text>
-                  </View>
-                  {entry.description ? (
-                    <Text style={style.summary}>{entry.description}</Text>
-                  ) : entry.highlights[0] ? (
-                    <View style={style.bullet}>
-                      <Text>{'• '}</Text>
-                      <Text style={style.bulletText}>
-                        <MarkdownRuns source={entry.highlights[0]} accentColor={style.accentColor} />
-                      </Text>
-                    </View>
-                  ) : null}
-                </View>
-                {(entry.description ? entry.highlights : entry.highlights.slice(1)).map((h, i) => (
-                  <View key={i} style={style.bullet}>
-                    <Text>{'• '}</Text>
-                    <Text style={style.bulletText}>
-                      <MarkdownRuns source={h} accentColor={style.accentColor} />
-                    </Text>
-                  </View>
-                ))}
               </View>
             ))}
           </View>

@@ -32,6 +32,7 @@ interface IGeminiResumePayload {
     name?: string;
     description?: string;
     url?: string;
+    repository?: string;
     startDate?: string;
     endDate?: string;
     highlights?: string[];
@@ -156,6 +157,7 @@ const mergePayloadIntoResume = (payload: IGeminiResumePayload): Resume => {
     name: (p.name ?? '').trim() || 'Project',
     description: (p.description ?? '').trim(),
     ...(sanitizeUrl(p.url) ? { url: sanitizeUrl(p.url)! } : {}),
+    ...(sanitizeUrl(p.repository) ? { repository: sanitizeUrl(p.repository)! } : {}),
     keywords: [],
     ...(sanitizeDate(p.startDate) ? { startDate: sanitizeDate(p.startDate)! } : {}),
     ...(sanitizeDate(p.endDate) ? { endDate: sanitizeDate(p.endDate)! } : {}),

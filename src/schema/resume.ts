@@ -68,6 +68,7 @@ const Project = z.object({
   startDate: IsoDate.optional(),
   endDate: IsoDate.optional(),
   url: z.string().url().optional().or(z.literal('')),
+  repository: z.string().url().optional().or(z.literal('')),
   roles: z.array(z.string()).default([]),
   entity: z.string().optional(),
   type: z.string().optional(),

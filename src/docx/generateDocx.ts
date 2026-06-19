@@ -121,6 +121,46 @@ export const generateDocx = async (resume: Resume): Promise<Blob> => {
     }
   }
 
+  // Projects
+  if (resume.projects.length > 0) {
+    children.push(sectionHeading('Projects'));
+    for (const entry of resume.projects) {
+      children.push(
+        new Paragraph({
+          spacing: { before: 80, after: 0 },
+          children: [
+            text(entry.name, { bold: true }),
+            text('  '),
+            text(formatPdfDateRange(entry.startDate, entry.endDate), { color: COLOR_MUTED }),
+          ],
+        }),
+      );
+      const projectLinks: string[] = [];
+      if (entry.url) {
+        projectLinks.push(entry.url.replace(/^https?:\/\//, '').replace(/\/$/, ''));
+      }
+      if (entry.repository) {
+        projectLinks.push(entry.repository.replace(/^https?:\/\//, '').replace(/\/$/, ''));
+      }
+      if (projectLinks.length > 0) {
+        children.push(
+          new Paragraph({
+            spacing: { after: 0 },
+            children: [text(projectLinks.join(' · '), { color: COLOR_MUTED })],
+          }),
+        );
+      }
+      if (entry.description) {
+        children.push(
+          new Paragraph({ spacing: { after: 40 }, children: [text(entry.description)] }),
+        );
+      }
+      for (const h of entry.highlights) {
+        children.push(bulletParagraph(stripMarkdown(h)));
+      }
+    }
+  }
+
   // Education
   if (resume.education.length > 0) {
     children.push(sectionHeading('Education'));
@@ -157,29 +197,6 @@ export const generateDocx = async (resume: Resume): Promise<Blob> => {
           ],
         }),
       );
-    }
-  }
-
-  // Projects
-  if (resume.projects.length > 0) {
-    children.push(sectionHeading('Projects'));
-    for (const entry of resume.projects) {
-      children.push(
-        new Paragraph({
-          spacing: { before: 80, after: 40 },
-          children: [
-            text(entry.name, { bold: true }),
-            text('  '),
-            text(formatPdfDateRange(entry.startDate, entry.endDate), { color: COLOR_MUTED }),
-          ],
-        }),
-      );
-      if (entry.description) {
-        children.push(new Paragraph({ children: [text(entry.description)] }));
-      }
-      for (const h of entry.highlights) {
-        children.push(bulletParagraph(stripMarkdown(h)));
-      }
     }
   }
 

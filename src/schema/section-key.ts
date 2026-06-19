@@ -2,9 +2,9 @@ export const SECTION_KEYS = [
   'basics',
   'summary',
   'work',
+  'projects',
   'education',
   'skills',
-  'projects',
   'certificates',
   'languages',
   'awards',
@@ -36,6 +36,7 @@ export const DEFAULT_VISIBLE_SECTIONS: SectionKey[] = [
   'basics',
   'summary',
   'work',
+  'projects',
   'education',
   'skills',
 ];

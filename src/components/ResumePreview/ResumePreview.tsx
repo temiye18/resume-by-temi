@@ -191,6 +191,79 @@ const ResumePreview: FC<IResumePreviewProps> = ({
         ))}
       </section>
 
+      {resume.projects && resume.projects.length > 0 ? (
+        <section>
+          <h2 className={v.sectionHeading}>Projects</h2>
+          {resume.projects.map((entry) => {
+            const links: { url: string; label: string }[] = [];
+            if (entry.url) {
+              links.push({
+                url: entry.url,
+                label: entry.url.replace(/^https?:\/\//, '').replace(/\/$/, ''),
+              });
+            }
+            if (entry.repository) {
+              links.push({
+                url: entry.repository,
+                label: entry.repository.replace(/^https?:\/\//, '').replace(/\/$/, ''),
+              });
+            }
+            return (
+              <div key={entry.name + entry.startDate}>
+                <div className={v.entryHeader}>
+                  <span className={v.entryRole}>{entry.name}</span>
+                  {entry.startDate || entry.endDate ? (
+                    <span className={v.entryDates}>
+                      {entry.startDate && entry.endDate
+                        ? formatDateRange(entry.startDate, entry.endDate)
+                        : entry.endDate || entry.startDate}
+                    </span>
+                  ) : null}
+                </div>
+                {links.length > 0 ? (
+                  <p className={cn(v.entryDates, 'mt-0.5')}>
+                    {links.map((link, i) => (
+                      <span key={link.url}>
+                        {i > 0 ? <span className="mx-1.5 text-faint">·</span> : null}
+                        {interactive ? (
+                          <a
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={linkClass}
+                          >
+                            {link.label}
+                          </a>
+                        ) : (
+                          <span>{link.label}</span>
+                        )}
+                      </span>
+                    ))}
+                  </p>
+                ) : null}
+                {entry.description ? (
+                  <p className={cn(v.summary, 'mt-1')}>{entry.description}</p>
+                ) : null}
+                {entry.bullets.length > 0 ? (
+                  <ul>
+                    {entry.bullets.map((bullet, i) => (
+                      <li key={i} className={cn(v.bullet, 'flex gap-2')}>
+                        <span aria-hidden className="select-none">
+                          •
+                        </span>
+                        <span className="flex-1">
+                          <MarkdownText source={bullet.text} />
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            );
+          })}
+        </section>
+      ) : null}
+
       <section>
         <h2 className={v.sectionHeading}>Education</h2>
         {resume.education.map((entry) => (

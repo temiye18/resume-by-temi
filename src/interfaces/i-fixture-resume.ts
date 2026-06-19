@@ -23,6 +23,16 @@ export interface IFixtureSkillGroup {
   items: string[];
 }
 
+export interface IFixtureProject {
+  name: string;
+  description: string;
+  url: string;
+  repository: string;
+  startDate: string;
+  endDate: string;
+  bullets: IFixtureBullet[];
+}
+
 export interface IFixtureContactProfile {
   label: string;
   url: string;
@@ -43,4 +53,5 @@ export interface IFixtureResume {
   experience: IFixtureExperience[];
   education: IFixtureEducation[];
   skills: IFixtureSkillGroup[];
+  projects?: IFixtureProject[];
 }
