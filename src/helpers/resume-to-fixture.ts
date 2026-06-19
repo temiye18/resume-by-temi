@@ -38,6 +38,7 @@ export const resumeToFixture = (resume: Resume): IFixtureResume => {
       degree: e.studyType ?? '',
       field: e.area ?? '',
       endDate: e.endDate ?? '',
+      score: e.score ?? '',
     })),
     skills: resume.skills.map((s) => ({
       group: s.name,

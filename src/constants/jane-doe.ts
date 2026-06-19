@@ -67,6 +67,7 @@ export const janeDoe: IFixtureResume = {
       degree: 'B.S.',
       field: 'Computer Science',
       endDate: '2019',
+      score: '',
     },
   ],
   skills: [

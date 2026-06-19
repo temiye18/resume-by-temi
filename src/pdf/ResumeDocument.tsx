@@ -214,6 +214,9 @@ const ResumeDocument: FC<IResumeDocumentProps> = ({ resume, templateId, theme, t
                         {' · '}
                         {[entry.studyType, entry.area].filter(Boolean).join(' ')}
                       </Text>
+                      {entry.score ? (
+                        <Text style={style.entryCompany}>{' · GPA: '}{entry.score}</Text>
+                      ) : null}
                     </Text>
                     <Text style={style.entryDates}>{entry.endDate ?? ''}</Text>
                   </View>

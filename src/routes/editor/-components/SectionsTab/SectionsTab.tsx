@@ -1,4 +1,4 @@
-import { type FC, type ChangeEvent, useState } from 'react';
+import { type FC, type ChangeEvent, type ReactNode, useEffect, useState } from 'react';
 import { m, AnimatePresence } from 'motion/react';
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
@@ -6,8 +6,25 @@ import {
   ArrowUp01Icon,
   ArrowRight01Icon,
   Delete02Icon,
+  DragDropVerticalIcon,
   PlusSignIcon,
 } from '@hugeicons/core-free-icons';
+import {
+  DndContext,
+  type DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { useResumeStore } from '@/store/resumeStore';
 import { newId } from '@/schema/resume';
 import { cn } from '@/lib/cn';
@@ -62,6 +79,11 @@ const Field: FC<IFieldProps> = ({
   );
 };
 
+interface IDragHandleProps {
+  attributes: ReturnType<typeof useSortable>['attributes'];
+  listeners: ReturnType<typeof useSortable>['listeners'];
+}
+
 interface IDisclosureProps {
   title: string;
   subtitle?: string;
@@ -70,6 +92,7 @@ interface IDisclosureProps {
   onRemove?: () => void;
   onMoveUp?: () => void;
   onMoveDown?: () => void;
+  dragHandle?: IDragHandleProps;
 }
 
 const Disclosure: FC<IDisclosureProps> = ({
@@ -80,6 +103,7 @@ const Disclosure: FC<IDisclosureProps> = ({
   onRemove,
   onMoveUp,
   onMoveDown,
+  dragHandle,
 }) => {
   const [open, setOpen] = useState(defaultOpen);
   return (
@@ -90,6 +114,17 @@ const Disclosure: FC<IDisclosureProps> = ({
       )}
     >
       <div className="flex items-center gap-1 px-2.5 py-2">
+        {dragHandle ? (
+          <button
+            type="button"
+            aria-label="Drag to reorder"
+            {...dragHandle.attributes}
+            {...dragHandle.listeners}
+            className="inline-flex h-7 w-6 shrink-0 items-center justify-center rounded-xs text-faint transition-colors duration-fast ease-out-quart hover:text-ink focus-visible:text-ink focus-visible:outline-none cursor-grab active:cursor-grabbing touch-none"
+          >
+            <HugeiconsIcon icon={DragDropVerticalIcon} size={14} strokeWidth={1.5} />
+          </button>
+        ) : null}
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
@@ -167,6 +202,39 @@ const SectionHeading: FC<{ children: React.ReactNode }> = ({ children }) => (
   <h3 className="font-mono text-2xs uppercase tracking-[0.2em] text-muted">{children}</h3>
 );
 
+interface ISkillKeywordsFieldProps {
+  value: string[];
+  onCommit: (next: string[]) => void;
+}
+
+const SkillKeywordsField: FC<ISkillKeywordsFieldProps> = ({ value, onCommit }) => {
+  const joined = value.join(', ');
+  const [draft, setDraft] = useState(joined);
+
+  useEffect(() => {
+    setDraft(joined);
+  }, [joined]);
+
+  const commit = () => {
+    const next = draft
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    onCommit(next);
+  };
+
+  return (
+    <textarea
+      value={draft}
+      onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setDraft(e.target.value)}
+      onBlur={commit}
+      placeholder="Comma-separated skills"
+      rows={3}
+      className="rounded-sm border border-border bg-bg px-2.5 py-2 font-sans text-sm text-ink placeholder:text-muted focus:border-accent focus:outline-none transition-colors duration-fast ease-out-quart resize-y"
+    />
+  );
+};
+
 interface IAddRowButtonProps {
   label: string;
   onClick: () => void;
@@ -189,6 +257,58 @@ const moveArrayItem = <T,>(arr: T[], from: number, to: number): T[] => {
   const [item] = next.splice(from, 1);
   next.splice(to, 0, item);
   return next;
+};
+
+interface ISortableEntryProps {
+  id: string;
+  children: (handle: IDragHandleProps, isDragging: boolean) => ReactNode;
+}
+
+const SortableEntry: FC<ISortableEntryProps> = ({ id, children }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id });
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.6 : 1,
+        zIndex: isDragging ? 10 : undefined,
+        position: 'relative',
+      }}
+    >
+      {children({ attributes, listeners }, isDragging)}
+    </div>
+  );
+};
+
+interface ISortableListProps {
+  ids: string[];
+  onReorder: (from: number, to: number) => void;
+  children: ReactNode;
+}
+
+const SortableList: FC<ISortableListProps> = ({ ids, onReorder, children }) => {
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const from = ids.indexOf(String(active.id));
+    const to = ids.indexOf(String(over.id));
+    if (from === -1 || to === -1) return;
+    onReorder(from, to);
+  };
+  return (
+    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <SortableContext items={ids} strategy={verticalListSortingStrategy}>
+        {children}
+      </SortableContext>
+    </DndContext>
+  );
 };
 
 
@@ -378,13 +498,23 @@ const SectionsTab: FC = () => {
             Add entry
           </button>
         </div>
+        <SortableList
+          ids={resume.work.map((w) => w.id)}
+          onReorder={(from, to) =>
+            patchResume((d) => {
+              d.work = moveArrayItem(d.work, from, to);
+            })
+          }
+        >
         <div className="flex flex-col gap-2">
           {resume.work.map((entry, i) => (
+            <SortableEntry key={entry.id} id={entry.id}>
+              {(handle) => (
             <Disclosure
-              key={entry.id}
               title={entry.position || 'New entry'}
               subtitle={entry.name}
               defaultOpen={i === 0}
+              dragHandle={handle}
               onRemove={() =>
                 patchResume((d) => {
                   d.work.splice(i, 1);
@@ -469,8 +599,11 @@ const SectionsTab: FC = () => {
                 </div>
               </div>
             </Disclosure>
+              )}
+            </SortableEntry>
           ))}
         </div>
+        </SortableList>
         {resume.work.length > 0 ? (
           <AddRowButton
             label="Add experience"
@@ -515,12 +648,22 @@ const SectionsTab: FC = () => {
             Add entry
           </button>
         </div>
+        <SortableList
+          ids={resume.projects.map((p) => p.id)}
+          onReorder={(from, to) =>
+            patchResume((d) => {
+              d.projects = moveArrayItem(d.projects, from, to);
+            })
+          }
+        >
         <div className="flex flex-col gap-2">
           {resume.projects.map((entry, i) => (
+            <SortableEntry key={entry.id} id={entry.id}>
+              {(handle) => (
             <Disclosure
-              key={entry.id}
               title={entry.name || 'New project'}
               subtitle={entry.description}
+              dragHandle={handle}
               onRemove={() =>
                 patchResume((d) => {
                   d.projects.splice(i, 1);
@@ -620,8 +763,11 @@ const SectionsTab: FC = () => {
                 </div>
               </div>
             </Disclosure>
+              )}
+            </SortableEntry>
           ))}
         </div>
+        </SortableList>
         {resume.projects.length > 0 ? (
           <AddRowButton
             label="Add project"
@@ -666,12 +812,22 @@ const SectionsTab: FC = () => {
             Add entry
           </button>
         </div>
+        <SortableList
+          ids={resume.education.map((e) => e.id)}
+          onReorder={(from, to) =>
+            patchResume((d) => {
+              d.education = moveArrayItem(d.education, from, to);
+            })
+          }
+        >
         <div className="flex flex-col gap-2">
           {resume.education.map((entry, i) => (
+            <SortableEntry key={entry.id} id={entry.id}>
+              {(handle) => (
             <Disclosure
-              key={entry.id}
               title={entry.institution || 'New entry'}
               subtitle={[entry.studyType, entry.area].filter(Boolean).join(' · ')}
+              dragHandle={handle}
               onRemove={() =>
                 patchResume((d) => {
                   d.education.splice(i, 1);
@@ -721,6 +877,16 @@ const SectionsTab: FC = () => {
                   })
                 }
               />
+              <Field
+                label="GPA"
+                value={entry.score ?? ''}
+                placeholder="3.8/4.0 or First Class Honours"
+                onChange={(v) =>
+                  patchResume((d) => {
+                    d.education[i].score = v || undefined;
+                  })
+                }
+              />
               <MonthPicker
                 label="End"
                 value={entry.endDate ?? ''}
@@ -731,8 +897,11 @@ const SectionsTab: FC = () => {
                 }
               />
             </Disclosure>
+              )}
+            </SortableEntry>
           ))}
         </div>
+        </SortableList>
         {resume.education.length > 0 ? (
           <AddRowButton
             label="Add education"
@@ -800,18 +969,13 @@ const SectionsTab: FC = () => {
                   <HugeiconsIcon icon={Delete02Icon} size={12} strokeWidth={1.5} />
                 </button>
               </div>
-              <input
-                value={group.keywords.join(', ')}
-                onChange={(e) =>
+              <SkillKeywordsField
+                value={group.keywords}
+                onCommit={(next) =>
                   patchResume((d) => {
-                    d.skills[i].keywords = e.target.value
-                      .split(',')
-                      .map((s) => s.trim())
-                      .filter(Boolean);
+                    d.skills[i].keywords = next;
                   })
                 }
-                placeholder="Comma-separated skills"
-                className="h-8 rounded-sm border border-border bg-bg px-2.5 font-sans text-sm text-ink placeholder:text-muted focus:border-accent focus:outline-none transition-colors duration-fast ease-out-quart"
               />
             </div>
           ))}

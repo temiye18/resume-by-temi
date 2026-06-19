@@ -16,7 +16,7 @@ Field guidance:
 - basics.profiles: every URL the candidate publishes. For each, set network ("LinkedIn", "GitHub", "X", "Website"), the human-readable username/handle, and the absolute url including the https:// prefix.
 - work[]: every role, in the order they appear. position is the job title, name is the company. startDate / endDate must be YYYY, YYYY-MM, or YYYY-MM-DD. Use the literal string "Present" if the role is current.
 - work[].highlights: each bullet as one string, leading dash/bullet character removed.
-- education[]: each entry. studyType is the degree ("Bachelor of Science"), area is the field ("Computer Science").
+- education[]: each entry. studyType is the degree ("Bachelor of Science"), area is the field ("Computer Science"). score is the GPA or grade ("3.8/4.0", "First Class Honours", "Distinction") if listed; omit otherwise.
 - skills[]: group related skills under a name. The name must NOT collide with a standard section heading (avoid "Languages", "Education", "Skills" — use "Programming Languages", "Frameworks & Tools", "Domain Skills").
 - projects[]: optional. Same date format rules. Capture every URL the document gives — set "url" for the live/website link and "repository" for the source-code link (GitHub, GitLab, Bitbucket, etc.). If only one URL is listed and it looks like a code host (github.com, gitlab.com, bitbucket.org, codeberg.org, sr.ht), put it in "repository"; otherwise in "url".
 
@@ -76,6 +76,7 @@ export const RESPONSE_SCHEMA = {
           institution: { type: 'string' },
           studyType: { type: 'string' },
           area: { type: 'string' },
+          score: { type: 'string' },
           startDate: { type: 'string' },
           endDate: { type: 'string' },
           highlights: { type: 'array', items: { type: 'string' } },

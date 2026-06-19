@@ -282,6 +282,12 @@ const ResumePreview: FC<IResumePreviewProps> = ({
               <span className={v.entryCompany}>
                 {entry.degree} {entry.field}
               </span>
+              {entry.score ? (
+                <>
+                  {' · '}
+                  <span className={v.entryCompany}>GPA: {entry.score}</span>
+                </>
+              ) : null}
             </div>
             <span className={v.entryDates}>{entry.endDate}</span>
           </div>

@@ -170,16 +170,19 @@ export const generateDocx = async (resume: Resume): Promise<Blob> => {
     children.push(sectionHeading('Education'));
     for (const entry of resume.education) {
       const degree = [entry.studyType, entry.area].filter(Boolean).join(' ');
+      const headerRuns = [
+        text(entry.institution, { bold: true }),
+        text(' · '),
+        text(degree, { color: COLOR_MUTED }),
+      ];
+      if (entry.score) {
+        headerRuns.push(text(' · '), text(`GPA: ${entry.score}`, { color: COLOR_MUTED }));
+      }
+      headerRuns.push(text('  '), text(entry.endDate ?? '', { color: COLOR_MUTED }));
       children.push(
         new Paragraph({
           spacing: { before: 80, after: 40 },
-          children: [
-            text(entry.institution, { bold: true }),
-            text(' · '),
-            text(degree, { color: COLOR_MUTED }),
-            text('  '),
-            text(entry.endDate ?? '', { color: COLOR_MUTED }),
-          ],
+          children: headerRuns,
         }),
       );
       for (const h of entry.highlights) {

@@ -23,6 +23,7 @@ interface IGeminiResumePayload {
     institution?: string;
     studyType?: string;
     area?: string;
+    score?: string;
     startDate?: string;
     endDate?: string;
     highlights?: string[];
@@ -138,6 +139,7 @@ const mergePayloadIntoResume = (payload: IGeminiResumePayload): Resume => {
     institution: (e.institution ?? '').trim(),
     area: (e.area ?? '').trim(),
     studyType: (e.studyType ?? '').trim(),
+    ...(e.score?.trim() ? { score: e.score.trim() } : {}),
     ...(sanitizeDate(e.startDate) ? { startDate: sanitizeDate(e.startDate)! } : {}),
     ...(sanitizeDate(e.endDate) ? { endDate: sanitizeDate(e.endDate)! } : {}),
     highlights: (e.highlights ?? []).map((h) => h.trim()).filter(Boolean),

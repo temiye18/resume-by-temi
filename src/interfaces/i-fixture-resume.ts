@@ -16,6 +16,7 @@ export interface IFixtureEducation {
   degree: string;
   field: string;
   endDate: string;
+  score: string;
 }
 
 export interface IFixtureSkillGroup {
