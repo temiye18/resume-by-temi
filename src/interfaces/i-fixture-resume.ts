@@ -6,9 +6,17 @@ export interface IFixtureExperience {
   role: string;
   company: string;
   location: string;
+  summary?: string;
   startDate: string;
   endDate: string;
   bullets: IFixtureBullet[];
+}
+
+export interface IFixtureCertificate {
+  name: string;
+  issuer: string;
+  date: string;
+  url: string;
 }
 
 export interface IFixtureEducation {
@@ -55,4 +63,5 @@ export interface IFixtureResume {
   education: IFixtureEducation[];
   skills: IFixtureSkillGroup[];
   projects?: IFixtureProject[];
+  certificates?: IFixtureCertificate[];
 }

@@ -15,10 +15,12 @@ Field guidance:
 - basics.location.city/region/countryCode: parse the location line. countryCode must be ISO 3166-1 alpha-2 ("US", "GB", "NG") or omitted.
 - basics.profiles: every URL the candidate publishes. For each, set network ("LinkedIn", "GitHub", "X", "Website"), the human-readable username/handle, and the absolute url including the https:// prefix.
 - work[]: every role, in the order they appear. position is the job title, name is the company. startDate / endDate must be YYYY, YYYY-MM, or YYYY-MM-DD. Use the literal string "Present" if the role is current.
+- work[].summary: a one-or-two sentence company blurb (what the company is, its industry, its scale) if the document offers one. Do NOT put achievements here; those are highlights.
 - work[].highlights: each bullet as one string, leading dash/bullet character removed.
 - education[]: each entry. studyType is the degree ("Bachelor of Science"), area is the field ("Computer Science"). score is the GPA or grade ("3.8/4.0", "First Class Honours", "Distinction") if listed; omit otherwise.
 - skills[]: group related skills under a name. The name must NOT collide with a standard section heading (avoid "Languages", "Education", "Skills" — use "Programming Languages", "Frameworks & Tools", "Domain Skills").
 - projects[]: optional. Same date format rules. Capture every URL the document gives — set "url" for the live/website link and "repository" for the source-code link (GitHub, GitLab, Bitbucket, etc.). If only one URL is listed and it looks like a code host (github.com, gitlab.com, bitbucket.org, codeberg.org, sr.ht), put it in "repository"; otherwise in "url".
+- certificates[]: certifications, licenses, or credentials. name is the credential title ("AWS Certified Solutions Architect"), issuer is the granting body ("Amazon Web Services", "Coursera"), date is when it was earned in YYYY or YYYY-MM, url is any verification / credly / linkedin-credential link.
 
 Do not invent facts. If a field is not in the document, omit it or leave it empty. Return JSON only, no commentary.`;
 
@@ -62,6 +64,7 @@ export const RESPONSE_SCHEMA = {
           position: { type: 'string' },
           name: { type: 'string' },
           location: { type: 'string' },
+          summary: { type: 'string' },
           startDate: { type: 'string' },
           endDate: { type: 'string' },
           highlights: { type: 'array', items: { type: 'string' } },
@@ -105,6 +108,18 @@ export const RESPONSE_SCHEMA = {
           startDate: { type: 'string' },
           endDate: { type: 'string' },
           highlights: { type: 'array', items: { type: 'string' } },
+        },
+      },
+    },
+    certificates: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          name: { type: 'string' },
+          issuer: { type: 'string' },
+          date: { type: 'string' },
+          url: { type: 'string' },
         },
       },
     },

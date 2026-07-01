@@ -113,6 +113,9 @@ const ResumeDocument: FC<IResumeDocumentProps> = ({ resume, templateId, theme, t
                       {formatPdfDateRange(entry.startDate, entry.endDate)}
                     </Text>
                   </View>
+                  {entry.summary ? (
+                    <Text style={style.summary}>{entry.summary}</Text>
+                  ) : null}
                   {entry.highlights[0] ? (
                     <View style={style.bullet}>
                       <Text>{'• '}</Text>
@@ -258,11 +261,29 @@ const ResumeDocument: FC<IResumeDocumentProps> = ({ resume, templateId, theme, t
           <View>
             <Text style={style.sectionHeading}>Certifications</Text>
             {resume.certificates.map((entry) => (
-              <View key={entry.id} style={style.skillsLine}>
-                <Text style={style.skillsLabel}>{entry.name}</Text>
-                <Text style={style.skillsText}>
-                  {[entry.issuer, entry.date].filter(Boolean).join(' · ')}
-                </Text>
+              <View key={entry.id} style={style.entryRow} wrap={false}>
+                <View style={style.entryHeader}>
+                  <Text>
+                    <Text style={style.entryRole}>{entry.name}</Text>
+                    {entry.issuer ? (
+                      <Text style={style.entryCompany}>{' · '}{entry.issuer}</Text>
+                    ) : null}
+                    {entry.url ? (
+                      <Text style={style.entryCompany}>
+                        {' · '}
+                        <Link
+                          src={entry.url}
+                          style={{ color: 'inherit', textDecoration: 'none' }}
+                        >
+                          {entry.url.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                        </Link>
+                      </Text>
+                    ) : null}
+                  </Text>
+                  {entry.date ? (
+                    <Text style={style.entryDates}>{entry.date}</Text>
+                  ) : null}
+                </View>
               </View>
             ))}
           </View>

@@ -181,6 +181,9 @@ const ResumePreview: FC<IResumePreviewProps> = ({
                 {formatDateRange(entry.startDate, entry.endDate)}
               </span>
             </div>
+            {entry.summary ? (
+              <p className={cn(v.summary, 'mt-1 whitespace-pre-line')}>{entry.summary}</p>
+            ) : null}
             <ul>
               {entry.bullets.map((bullet, i) => (
                 <li key={i} className={cn(v.bullet, 'flex gap-2')}>
@@ -304,6 +307,45 @@ const ResumePreview: FC<IResumePreviewProps> = ({
           </p>
         ))}
       </section>
+
+      {resume.certificates && resume.certificates.length > 0 ? (
+        <section>
+          <h2 className={v.sectionHeading}>Certifications</h2>
+          {resume.certificates.map((entry, idx) => (
+            <div key={`cert-${idx}-${entry.name}`} className={v.entryHeader}>
+              <div className="flex-1 min-w-0">
+                <span className={v.entryRole}>{entry.name}</span>
+                {entry.issuer ? (
+                  <>
+                    {' · '}
+                    <span className={v.entryCompany}>{entry.issuer}</span>
+                  </>
+                ) : null}
+                {entry.url ? (
+                  <>
+                    {' · '}
+                    {interactive ? (
+                      <a
+                        href={entry.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={linkClass}
+                      >
+                        {entry.url.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                      </a>
+                    ) : (
+                      <span className={v.entryCompany}>
+                        {entry.url.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                      </span>
+                    )}
+                  </>
+                ) : null}
+              </div>
+              {entry.date ? <span className={v.entryDates}>{entry.date}</span> : null}
+            </div>
+          ))}
+        </section>
+      ) : null}
     </article>
   );
 };

@@ -115,10 +115,15 @@ export const generateDocx = async (resume: Resume): Promise<Blob> => {
       );
       children.push(
         new Paragraph({
-          spacing: { before: 80, after: 40 },
+          spacing: { before: 80, after: entry.summary ? 0 : 40 },
           children: headerRuns,
         }),
       );
+      if (entry.summary) {
+        children.push(
+          new Paragraph({ spacing: { after: 40 }, children: [text(entry.summary)] }),
+        );
+      }
       for (const h of entry.highlights) {
         children.push(bulletParagraph(stripMarkdown(h)));
       }
@@ -211,14 +216,18 @@ export const generateDocx = async (resume: Resume): Promise<Blob> => {
   if (resume.certificates.length > 0) {
     children.push(sectionHeading('Certifications'));
     for (const entry of resume.certificates) {
+      const runs = [text(entry.name, { bold: true })];
+      const tail: string[] = [];
+      if (entry.issuer) tail.push(entry.issuer);
+      if (entry.url) {
+        tail.push(entry.url.replace(/^https?:\/\//, '').replace(/\/$/, ''));
+      }
+      if (entry.date) tail.push(entry.date);
+      if (tail.length > 0) {
+        runs.push(text(' · '), text(tail.join(' · '), { color: COLOR_MUTED }));
+      }
       children.push(
-        new Paragraph({
-          spacing: { after: 40 },
-          children: [
-            text(`${entry.name}: `, { bold: true }),
-            text([entry.issuer, entry.date].filter(Boolean).join(' · ')),
-          ],
-        }),
+        new Paragraph({ spacing: { after: 40 }, children: runs }),
       );
     }
   }

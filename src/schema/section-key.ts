@@ -39,4 +39,5 @@ export const DEFAULT_VISIBLE_SECTIONS: SectionKey[] = [
   'projects',
   'education',
   'skills',
+  'certificates',
 ];

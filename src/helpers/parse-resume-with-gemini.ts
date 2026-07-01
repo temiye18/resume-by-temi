@@ -15,9 +15,16 @@ interface IGeminiResumePayload {
     position?: string;
     name?: string;
     location?: string;
+    summary?: string;
     startDate?: string;
     endDate?: string;
     highlights?: string[];
+  }[];
+  certificates?: {
+    name?: string;
+    issuer?: string;
+    date?: string;
+    url?: string;
   }[];
   education?: {
     institution?: string;
@@ -128,6 +135,7 @@ const mergePayloadIntoResume = (payload: IGeminiResumePayload): Resume => {
     name: (w.name ?? '').trim(),
     position: (w.position ?? '').trim(),
     location: (w.location ?? '').trim(),
+    ...(w.summary?.trim() ? { summary: w.summary.trim() } : {}),
     startDate: sanitizeDate(w.startDate) ?? fallbackYear,
     ...(sanitizeDate(w.endDate) ? { endDate: sanitizeDate(w.endDate)! } : {}),
     highlights: (w.highlights ?? []).map((h) => h.trim()).filter(Boolean),
@@ -153,6 +161,16 @@ const mergePayloadIntoResume = (payload: IGeminiResumePayload): Resume => {
       keywords: (s.keywords ?? []).map((k) => k.trim()).filter(Boolean),
     }))
     .filter((s) => s.name && s.keywords.length > 0);
+
+  resume.certificates = (payload.certificates ?? [])
+    .map((c) => ({
+      id: newId(),
+      name: (c.name ?? '').trim(),
+      ...(c.issuer?.trim() ? { issuer: c.issuer.trim() } : {}),
+      ...(sanitizeDate(c.date) ? { date: sanitizeDate(c.date)! } : {}),
+      ...(sanitizeUrl(c.url) ? { url: sanitizeUrl(c.url)! } : {}),
+    }))
+    .filter((c) => c.name);
 
   resume.projects = (payload.projects ?? []).map((p) => ({
     id: newId(),

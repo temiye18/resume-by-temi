@@ -29,6 +29,7 @@ export const resumeToFixture = (resume: Resume): IFixtureResume => {
       role: w.position,
       company: w.name,
       location: w.location ?? '',
+      summary: w.summary ?? '',
       startDate: w.startDate,
       endDate: w.endDate ?? 'Present',
       bullets: w.highlights.map((text) => ({ text })),
@@ -43,6 +44,12 @@ export const resumeToFixture = (resume: Resume): IFixtureResume => {
     skills: resume.skills.map((s) => ({
       group: s.name,
       items: s.keywords,
+    })),
+    certificates: resume.certificates.map((c) => ({
+      name: c.name,
+      issuer: c.issuer ?? '',
+      date: c.date ?? '',
+      url: c.url ?? '',
     })),
     projects: resume.projects.map((p) => ({
       name: p.name,
