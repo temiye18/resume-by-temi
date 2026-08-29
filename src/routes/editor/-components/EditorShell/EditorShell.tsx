@@ -12,8 +12,10 @@ import { useResumeStore, useResumeTemporal } from '@/store/resumeStore';
 import { getResume } from '@/db/repository';
 import { startAutosave, stopAutosave, flushAutosaveNow } from '@/store/middleware/autosave';
 import { generatePdf } from '@/pdf/generatePdf';
+import { embedResumeSource } from '@/pdf/embedSource';
 import { atsCheck } from '@/pdf/atsCheck';
 import { generateDocx } from '@/docx/generateDocx';
+import { toExportEnvelope } from '@/helpers';
 import { useIsDesktop } from '@/hooks/useIsDesktop';
 import type { EditorTab } from '@/types/editor-tab-type';
 import type { IAtsCheckResult } from '@/interfaces/i-ats-check-result';
@@ -79,7 +81,9 @@ const EditorShell: FC<IEditorShellProps> = ({ resumeId }) => {
     setPdfBusy(true);
     try {
       const blob = await generatePdf({ resume, templateId, theme });
-      saveAs(blob, `${slugify(name)}.pdf`);
+      const envelope = JSON.stringify(toExportEnvelope({ resume, templateId, theme, name }));
+      const withSource = await embedResumeSource(blob, envelope);
+      saveAs(withSource, `${slugify(name)}.pdf`);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       window.alert(`Could not generate PDF: ${message}`);
@@ -100,7 +104,8 @@ const EditorShell: FC<IEditorShellProps> = ({ resumeId }) => {
   };
 
   const handleDownloadJson = () => {
-    const blob = new Blob([JSON.stringify(resume, null, 2)], { type: 'application/json' });
+    const envelope = toExportEnvelope({ resume, templateId, theme, name });
+    const blob = new Blob([JSON.stringify(envelope, null, 2)], { type: 'application/json' });
     saveAs(blob, `${slugify(name)}.json`);
   };
 

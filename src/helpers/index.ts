@@ -10,3 +10,4 @@ export { analyzeJobMatch } from './analyze-job-match';
 export { tailorMutator } from './apply-tailor-suggestion';
 export { streamTailorSuggestions } from './tailor-resume-stream';
 export { streamRefine } from './refine-text-stream';
+export { toExportEnvelope, readBuilderMeta } from './resume-file';

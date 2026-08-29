@@ -15,10 +15,12 @@ A free, no-account, privacy-first web app for building **100% ATS-friendly** ré
 | **WYSIWYG editor** | Sections / Template / Theme / Export tabs. Autosave to IndexedDB, undo / redo with keystroke grouping, Tiptap-powered rich text for summary and bullets, markdown round-trip on every field. |
 | **Six templates** | Modern Minimal, Classic Serif, Tech Sans, Executive, Compact, Editorial. Each ships with its own typographic system; all six are single-column and pass the in-app ATS check. |
 | **Live theming** | Heading font, body font, accent color, type scale, line height — all reactive on the live canvas through CSS custom properties. The PDF mirrors the canvas spacing exactly. |
-| **Vector PDF export** | `@react-pdf/renderer` — real text in the content stream with ToUnicode CMaps, embedded fonts, single-column layout. Never image-based, never `html2canvas`. |
+| **Vector PDF export** | `@react-pdf/renderer` — real text in the content stream with ToUnicode CMaps, embedded fonts, single-column layout. Never image-based, never `html2canvas`. Each exported PDF also embeds an editable source copy, so re-importing it on the dashboard restores your template, fonts, and settings instantly — no re-parse. |
 | **DOCX export** | Plain Calibri 11pt for places that prefer Word; ATS-safe by default. |
-| **JSON Resume export / import** | Full round-trip with the JSON Resume schema (with an `x-builder` extension for per-doc theme + paper size). |
+| **JSON Resume export / import** | Full round-trip with the JSON Resume schema. Files exported here carry a namespaced `meta.resumeBuilder` block (template + fonts + theme), so re-importing restores the exact formatting, not just the content — while staying valid JSON Resume for other tools. |
 | **Smart parse** | Drop your old PDF / DOCX résumé on the dashboard, Gemini 2.5 Flash reads the layout and prefills the editor. Local heuristic parser stays available for files you'd rather keep on-device. |
+| **AI · Tailor to a job** | Paste a job description in the editor; accept/reject rewrites stream in to close the exact ATS gaps, the match score climbs as you accept, then apply them or save a separate tailored version. Grounded in your résumé — never fabricated. |
+| **AI · Refine any field** | Under every summary, bullet, and description, a Refine control streams two sharper, ATS-friendly rewrites to choose from. |
 | **24-rule ATS check** | Numeric score (0–100), per-rule findings, optional job-description keyword matching against a 510-entry skill taxonomy. Catches what Affinda / Jobscan / ResumeWorded catch. |
 | **Multi-résumé dashboard** | Thumbnails, rename, duplicate, delete. Live previews reflect the actual stored content per card. |
 | **Smooth scroll on landing surfaces** | Lenis on `/`, `/templates`, `/privacy`, `/about`. Disabled on the editor route (multiple nested scroll containers) and under `prefers-reduced-motion`. |
@@ -184,13 +186,13 @@ Two render trees, one `Resume` data model. The on-screen preview (`src/component
 
 ---
 
-## Smart parse: how the proxy works
+## AI features: how the proxy works
 
-The dashboard's **Smart parse** import sends the dropped file to Gemini 2.5 Flash through a server-side proxy that holds the API key. Three equivalent wrappers exist; the project picks one based on where it's running. They all delegate to `server/gemini-parse.ts` so behaviour is identical:
+Three AI features — **Smart parse** (import), **Tailor to a job**, and per-field **Refine** — send content to Gemini 2.5 Flash through a server-side proxy that holds the API key. Three equivalent host wrappers exist; the project picks one based on where it's running. Each delegates to a shared core per feature (`server/gemini-parse.ts`, `server/gemini-tailor.ts`, `server/gemini-refine.ts`) so behaviour is identical. Endpoints: `POST /api/parse-resume`, `POST /api/tailor-resume` (NDJSON-streamed), `POST /api/refine-text` (streamed). Any new AI endpoint must mirror all three wrappers.
 
-- **Cloudflare Workers + Static Assets** — `server/worker.ts` is the Worker entry declared in `wrangler.toml`. It routes `POST /api/parse-resume` to the Gemini helper and passes every other request through the `ASSETS` binding to the built SPA. Key from the `GEMINI_API_KEY` env binding in the Cloudflare dashboard.
-- **Vercel** — `api/parse-resume.ts` is a Vercel serverless function auto-detected from `api/`. Key from `GEMINI_API_KEY` in the Vercel project's env vars.
-- **Local dev** — `server/parse-resume-dev-plugin.ts` is a Vite middleware that handles `/api/parse-resume`. Key from `.env`.
+- **Cloudflare Workers + Static Assets** — `server/worker.ts` is the Worker entry declared in `wrangler.toml`. It routes `POST /api/parse-resume`, `/api/tailor-resume`, and `/api/refine-text` to their Gemini helpers and passes every other request through the `ASSETS` binding to the built SPA. Key from the `GEMINI_API_KEY` env binding in the Cloudflare dashboard.
+- **Vercel** — `api/parse-resume.ts`, `api/tailor-resume.ts`, and `api/refine-text.ts` are Vercel serverless functions auto-detected from `api/`. Key from `GEMINI_API_KEY` in the Vercel project's env vars.
+- **Local dev** — `server/parse-resume-dev-plugin.ts`, `server/tailor-resume-dev-plugin.ts`, and `server/refine-text-dev-plugin.ts` are Vite middleware handling the three routes. Key from `.env`.
 
 Each host reads only its own config: Cloudflare follows `wrangler.toml` and ignores `api/`; Vercel scans `api/` and ignores `wrangler.toml`. The two production stacks can coexist on the same branch.
 
@@ -238,7 +240,7 @@ The export pipeline is structured so producing an ATS-hostile PDF is impossible 
 
 The editor stays on your machine. Every keystroke is autosaved to IndexedDB on your device. PDF and DOCX are rendered in the same browser tab; no upload step.
 
-The single exception is **opt-in Smart parse** on import: that path sends the file you choose to Google's Gemini API through our proxy. We log nothing on our side; Google's retention policy applies to what they receive. A local-only heuristic parser remains available for users who'd rather not involve Gemini.
+The exceptions are the three **opt-in AI features** — Smart parse (import), Tailor to a job, and Refine — which send the content you choose (a file, or a field / your résumé plus a job description) to Google's Gemini API through our proxy. Each is something you start deliberately; the instant match score shown before you tailor is computed in your browser with no network call. We log nothing on our side; Google's retention policy applies to what they receive. A local-only heuristic parser remains available for import for users who'd rather not involve Gemini.
 
 See the in-app `/privacy` page for the full disclosure.
 

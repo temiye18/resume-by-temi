@@ -8,9 +8,12 @@ import {
   Delete02Icon,
 } from '@hugeicons/core-free-icons';
 import { db } from '@/db/dexie';
-import { createResume, clearAllData } from '@/db/repository';
-import { emptyResume, ResumeSchema } from '@/schema/resume';
-import { timeOfDayGreeting, extractResumeText, parseResumeText } from '@/helpers';
+import { createResume, clearAllData, defaultThemeOverrides } from '@/db/repository';
+import { emptyResume, ResumeSchema, type Resume } from '@/schema/resume';
+import { timeOfDayGreeting, extractResumeText, parseResumeText, readBuilderMeta } from '@/helpers';
+import { readEmbeddedSource } from '@/pdf/extractSource';
+import { detectPdfStyle } from '@/pdf/detectPdfStyle';
+import type { IResumeRecord } from '@/interfaces/i-resume-record';
 import { cn } from '@/lib/cn';
 import ResumeCard from './ResumeCard';
 import AiParseLoader from '@/components/AiParseLoader/AiParseLoader';
@@ -43,6 +46,60 @@ const Dashboard: FC = () => {
   const isJsonFile = (file: File): boolean =>
     file.type === 'application/json' || file.name.toLowerCase().endsWith('.json');
 
+  const isPdfFile = (file: File): boolean =>
+    file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+
+  const importedName = (dataName: string | undefined): string =>
+    dataName && dataName !== 'Your Name' ? `${dataName} (imported)` : 'Imported résumé';
+
+  // Our own exports carry a `meta.resumeBuilder` block with template + theme.
+  // When present, rebuild the record with full fidelity — no AI, no lost formatting.
+  const restoreFromEnvelope = async (parsed: unknown): Promise<IResumeRecord | null> => {
+    const result = ResumeSchema.safeParse(parsed);
+    const meta = readBuilderMeta(parsed);
+    if (!result.success || !meta) return null;
+    return createResume(
+      result.data,
+      meta.templateId,
+      meta.name ?? importedName(result.data.basics.name),
+      meta.theme,
+    );
+  };
+
+  const restoreFromPdf = async (file: File): Promise<IResumeRecord | null> => {
+    const source = await readEmbeddedSource(file);
+    if (!source) return null;
+    try {
+      return await restoreFromEnvelope(JSON.parse(source));
+    } catch {
+      return null;
+    }
+  };
+
+  // Legacy PDFs (exported before formatting was embedded) can't carry the template or
+  // accent, but a PDF still reliably yields its embedded font families and page size —
+  // recover those on top of the parsed content so less has to be re-set by hand.
+  const createStyledRecord = async (
+    file: File,
+    resume: Resume,
+    name: string,
+  ): Promise<IResumeRecord> => {
+    if (!isPdfFile(file)) return createResume(resume, 'modern-minimal', name);
+    const hints = await detectPdfStyle(file);
+    const styled = hints.paperSize
+      ? { ...resume, 'x-builder': { ...resume['x-builder'], paperSize: hints.paperSize } }
+      : resume;
+    const theme =
+      hints.headingFont || hints.bodyFont
+        ? {
+            ...defaultThemeOverrides(),
+            ...(hints.headingFont ? { headingFont: hints.headingFont } : {}),
+            ...(hints.bodyFont ? { bodyFont: hints.bodyFont } : {}),
+          }
+        : undefined;
+    return createResume(styled, 'modern-minimal', name, theme);
+  };
+
   const importJson = async (file: File) => {
     const text = await file.text();
     const parsed = JSON.parse(text);
@@ -52,11 +109,15 @@ const Dashboard: FC = () => {
       setBusy(false);
       return;
     }
-    const name =
-      result.data.basics.name && result.data.basics.name !== 'Your Name'
-        ? `${result.data.basics.name} (imported)`
-        : 'Imported résumé';
-    const record = await createResume(result.data, 'modern-minimal', name);
+    const meta = readBuilderMeta(parsed);
+    const record = meta
+      ? await createResume(
+          result.data,
+          meta.templateId,
+          meta.name ?? importedName(result.data.basics.name),
+          meta.theme,
+        )
+      : await createResume(result.data, 'modern-minimal', importedName(result.data.basics.name));
     setBusy(false);
     navigate({ to: '/editor/$resumeId', params: { resumeId: record.id } });
   };
@@ -83,7 +144,7 @@ const Dashboard: FC = () => {
       validation.data.basics.name && validation.data.basics.name !== 'Your Name'
         ? `${validation.data.basics.name} (imported)`
         : 'Imported résumé';
-    const record = await createResume(validation.data, 'modern-minimal', name);
+    const record = await createStyledRecord(file, validation.data, name);
     setBusy(false);
     navigate({ to: '/editor/$resumeId', params: { resumeId: record.id } });
   };
@@ -95,6 +156,14 @@ const Dashboard: FC = () => {
       if (isJsonFile(file)) {
         await importJson(file);
         return;
+      }
+      if (isPdfFile(file)) {
+        const restored = await restoreFromPdf(file);
+        if (restored) {
+          setBusy(false);
+          navigate({ to: '/editor/$resumeId', params: { resumeId: restored.id } });
+          return;
+        }
       }
       setAiFile({ name: file.name, size: file.size });
       setAiStage('uploaded');
@@ -116,7 +185,7 @@ const Dashboard: FC = () => {
           validation.data.basics.name && validation.data.basics.name !== 'Your Name'
             ? `${validation.data.basics.name} (imported)`
             : 'Imported résumé';
-        const record = await createResume(validation.data, 'modern-minimal', name);
+        const record = await createStyledRecord(file, validation.data, name);
         setAiOpen(false);
         setBusy(false);
         navigate({ to: '/editor/$resumeId', params: { resumeId: record.id } });
@@ -141,6 +210,14 @@ const Dashboard: FC = () => {
       if (isJsonFile(file)) {
         await importJson(file);
         return;
+      }
+      if (isPdfFile(file)) {
+        const restored = await restoreFromPdf(file);
+        if (restored) {
+          setBusy(false);
+          navigate({ to: '/editor/$resumeId', params: { resumeId: restored.id } });
+          return;
+        }
       }
       await importLocal(file);
     } catch (e) {

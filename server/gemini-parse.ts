@@ -11,7 +11,7 @@ Field guidance:
 - basics.name: the candidate's full name. If unknown, leave empty.
 - basics.label: their current title or headline (e.g. "Senior Software Engineer"). Leave empty if not stated.
 - basics.email and basics.phone: as written in the document.
-- basics.summary: the prose summary or profile paragraph. Plain text; preserve sentence order. Empty if there isn't one.
+- basics.summary: the candidate's summary / profile paragraph. It may sit under any heading — "Summary", "Professional Summary", "Career Summary", "Executive Summary", "Summary of Qualifications", "Profile", "Professional Profile", "Career Profile", "About", "About Me", "Overview", "Objective", "Career Objective", "Personal Statement" — OR it may be an UNLABELED paragraph sitting directly under the name/contact block, above the first titled section. Capture it in ALL of these cases. If it is written as bullet points, join them into one short prose paragraph. Keep it plain text, preserve sentence order, and do NOT also place it in basics.label. Leave it empty ONLY if the résumé genuinely has no summary/profile/objective text at all.
 - basics.location.city/region/countryCode: parse the location line. countryCode must be ISO 3166-1 alpha-2 ("US", "GB", "NG") or omitted.
 - basics.profiles: every URL the candidate publishes. For each, set network ("LinkedIn", "GitHub", "X", "Website"), the human-readable username/handle, and the absolute url including the https:// prefix.
 - work[]: every role, in the order they appear. position is the job title, name is the company. startDate / endDate must be YYYY, YYYY-MM, or YYYY-MM-DD. Use the literal string "Present" if the role is current.

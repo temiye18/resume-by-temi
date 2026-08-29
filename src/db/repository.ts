@@ -18,6 +18,7 @@ export const createResume = async (
   resume: Resume,
   templateId: ResumeVariant = 'modern-minimal',
   name?: string,
+  theme?: IResumeThemeOverrides,
 ): Promise<IResumeRecord> => {
   const now = new Date().toISOString();
   const record: IResumeRecord = {
@@ -25,7 +26,7 @@ export const createResume = async (
     name: name ?? resume.basics.name ?? 'Untitled résumé',
     resume,
     templateId,
-    theme: defaultThemeOverrides(),
+    theme: theme ?? defaultThemeOverrides(),
     createdAt: now,
     updatedAt: now,
     schemaVersion: 1,

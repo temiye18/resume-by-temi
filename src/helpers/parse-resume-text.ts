@@ -13,9 +13,19 @@ const TWITTER_RE = /(?:https?:\/\/)?(?:www\.|x\.com\/|twitter\.com\/)[^\s)]+/i;
 
 const SECTION_KEYWORDS: Record<string, string> = {
   summary: 'summary',
+  'professional summary': 'summary',
+  'career summary': 'summary',
+  'executive summary': 'summary',
+  'qualifications summary': 'summary',
   profile: 'summary',
+  'professional profile': 'summary',
+  'career profile': 'summary',
   objective: 'summary',
+  'career objective': 'summary',
+  'personal statement': 'summary',
+  overview: 'summary',
   about: 'summary',
+  'about me': 'summary',
   experience: 'work',
   'work experience': 'work',
   'work history': 'work',
@@ -376,6 +386,20 @@ export const parseResumeText = (text: string): IResumeParseResult => {
         roles: [],
       }));
     }
+  }
+
+  if (!resume.basics.summary) {
+    const prose = header.filter(
+      (l) =>
+        l !== contact.name &&
+        l !== contact.label &&
+        l !== contact.location &&
+        l.length > 80 &&
+        /[.?!]/.test(l) &&
+        /[a-z]{3,}\s+[a-z]{3,}\s+[a-z]{3,}/.test(l) &&
+        !l.includes('@'),
+    );
+    if (prose.length > 0) resume.basics.summary = prose.join(' ').trim();
   }
 
   resume.skills = buildSkillsFromText(text);
