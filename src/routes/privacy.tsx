@@ -74,13 +74,13 @@ const PrivacyPage: FC = () => {
               }}
             >
               <p>
-                There is exactly one place in the product where résumé content leaves your
-                browser, and it is opt-in: the Smart parse button on the dashboard's import
-                card. When you choose Smart parse, the file you drop in (your old PDF or DOCX)
-                is sent to Google's Gemini API so it can read the layout, headings, and dates
-                and return structured fields. We never see the file ourselves; the call goes
-                through a Cloudflare Pages Function that holds our API key and forwards your
-                upload to Gemini.
+                There are two opt-in places in the product where résumé content leaves your
+                browser, and both are things you choose to start. The first is the Smart parse
+                button on the dashboard's import card. When you choose Smart parse, the file you
+                drop in (your old PDF or DOCX) is sent to Google's Gemini API so it can read the
+                layout, headings, and dates and return structured fields. We never see the file
+                ourselves; the call goes through a Cloudflare Pages Function that holds our API
+                key and forwards your upload to Gemini.
               </p>
               <p>
                 What gets sent: the file you chose, its filename, and its MIME type. What does
@@ -88,6 +88,15 @@ const PrivacyPage: FC = () => {
                 IndexedDB, the names of your other résumés, your browser fingerprint. We do not
                 log the upload or its response on our side; Google's retention policy applies to
                 what they receive.
+              </p>
+              <p>
+                The second is Tailor to a job, in the editor. When you paste a job description
+                and choose Enhance with AI, that job description and a condensed copy of the
+                résumé you're editing (its summary, roles, bullets, and skills) are sent through
+                the same Cloudflare Function to Gemini, which streams back suggested rewrites.
+                Nothing is applied until you accept it, and nothing about the tailoring is logged
+                or stored on our side. The instant match score shown before you enhance is
+                computed entirely in your browser, with no network call.
               </p>
               <p>
                 If you'd rather not involve Gemini, the import card has a small secondary link

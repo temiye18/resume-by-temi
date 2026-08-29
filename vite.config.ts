@@ -5,10 +5,12 @@ import { TanStackRouterVite } from '@tanstack/router-plugin/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'node:path';
 import { parseResumeDevPlugin } from './server/parse-resume-dev-plugin';
+import { tailorResumeDevPlugin } from './server/tailor-resume-dev-plugin';
 
 export default defineConfig({
   plugins: [
     parseResumeDevPlugin(),
+    tailorResumeDevPlugin(),
     TanStackRouterVite({ target: 'react', autoCodeSplitting: true }),
     react(),
     tailwindcss(),

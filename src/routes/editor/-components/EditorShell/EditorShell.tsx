@@ -7,6 +7,7 @@ import EditorCanvas from '../EditorCanvas/EditorCanvas';
 import EditorTabContent from '../EditorTabContent/EditorTabContent';
 import MobileTabBar from '../MobileTabBar/MobileTabBar';
 import AtsCheckModal from '../AtsCheckModal/AtsCheckModal';
+import TailorDrawer from '../TailorDrawer/TailorDrawer';
 import { useResumeStore } from '@/store/resumeStore';
 import { getResume } from '@/db/repository';
 import { startAutosave, stopAutosave, flushAutosaveNow } from '@/store/middleware/autosave';
@@ -46,6 +47,7 @@ const EditorShell: FC<IEditorShellProps> = ({ resumeId }) => {
   const [atsBusy, setAtsBusy] = useState(false);
   const [atsResult, setAtsResult] = useState<IAtsCheckResult | null>(null);
   const [atsOpen, setAtsOpen] = useState(false);
+  const [tailorOpen, setTailorOpen] = useState(false);
   const [jobDescription, setJobDescription] = useState('');
 
   useEffect(() => {
@@ -140,7 +142,11 @@ const EditorShell: FC<IEditorShellProps> = ({ resumeId }) => {
   if (isDesktop) {
     return (
       <div className="flex h-screen flex-col bg-bg">
-        <EditorTopBar onDownload={handleDownloadPdf} downloading={pdfBusy} />
+        <EditorTopBar
+          onDownload={handleDownloadPdf}
+          downloading={pdfBusy}
+          onOpenTailor={() => setTailorOpen(true)}
+        />
         <div className="flex flex-1 overflow-hidden">
           <SidePanel
             activeTab={activeTab}
@@ -149,6 +155,7 @@ const EditorShell: FC<IEditorShellProps> = ({ resumeId }) => {
             onDownloadDocx={handleDownloadDocx}
             onDownloadJson={handleDownloadJson}
             onAtsCheck={handleAtsCheck}
+            onOpenTailor={() => setTailorOpen(true)}
             jobDescription={jobDescription}
             onChangeJobDescription={setJobDescription}
             pdfBusy={pdfBusy}
@@ -165,13 +172,22 @@ const EditorShell: FC<IEditorShellProps> = ({ resumeId }) => {
           result={atsResult}
           onClose={() => setAtsOpen(false)}
         />
+        <TailorDrawer
+          open={tailorOpen}
+          onClose={() => setTailorOpen(false)}
+          resumeId={resumeId}
+        />
       </div>
     );
   }
 
   return (
     <div className="flex h-[100dvh] flex-col bg-bg">
-      <EditorTopBar onDownload={handleDownloadPdf} downloading={pdfBusy} />
+      <EditorTopBar
+        onDownload={handleDownloadPdf}
+        downloading={pdfBusy}
+        onOpenTailor={() => setTailorOpen(true)}
+      />
       <main className="flex-1 overflow-hidden">
         {activeTab === 'preview' ? (
           <EditorCanvas />
@@ -183,6 +199,7 @@ const EditorShell: FC<IEditorShellProps> = ({ resumeId }) => {
               onDownloadDocx={handleDownloadDocx}
               onDownloadJson={handleDownloadJson}
               onAtsCheck={handleAtsCheck}
+              onOpenTailor={() => setTailorOpen(true)}
               jobDescription={jobDescription}
               onChangeJobDescription={setJobDescription}
               pdfBusy={pdfBusy}
@@ -198,6 +215,11 @@ const EditorShell: FC<IEditorShellProps> = ({ resumeId }) => {
         busy={atsBusy}
         result={atsResult}
         onClose={() => setAtsOpen(false)}
+      />
+      <TailorDrawer
+        open={tailorOpen}
+        onClose={() => setTailorOpen(false)}
+        resumeId={resumeId}
       />
     </div>
   );

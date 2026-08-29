@@ -6,3 +6,6 @@ export { displayProfileText } from './display-profile';
 export { recognizeSkills, groupSkillsByCategory } from './recognize-skills';
 export { extractResumeText } from './extract-resume-text';
 export { parseResumeText, type IResumeParseResult } from './parse-resume-text';
+export { analyzeJobMatch } from './analyze-job-match';
+export { tailorMutator } from './apply-tailor-suggestion';
+export { streamTailorSuggestions } from './tailor-resume-stream';

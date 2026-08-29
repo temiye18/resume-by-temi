@@ -225,6 +225,20 @@
   .animate-soft-pulse {
     animation: soft-pulse 2.4s var(--ease-in-out-quart) infinite;
   }
+  @keyframes spin-cw {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes spin-ccw {
+    to { transform: rotate(-360deg); }
+  }
+  .animate-spin-cw {
+    animation: spin-cw 3.4s linear infinite;
+    transform-origin: center;
+  }
+  .animate-spin-ccw {
+    animation: spin-ccw 5.2s linear infinite;
+    transform-origin: center;
+  }
   .typewriter-char {
     transition: opacity 60ms linear;
   }

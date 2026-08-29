@@ -1,7 +1,7 @@
 import { type FC, useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { ArrowLeft01Icon, Download04Icon } from '@hugeicons/core-free-icons';
+import { ArrowLeft01Icon, Download04Icon, AnalyticsUpIcon } from '@hugeicons/core-free-icons';
 import AutosaveIndicator from '../AutosaveIndicator/AutosaveIndicator';
 import ThemeToggle from '@/components/ThemeToggle/ThemeToggle';
 import { useResumeStore } from '@/store/resumeStore';
@@ -9,9 +9,14 @@ import { useResumeStore } from '@/store/resumeStore';
 interface IEditorTopBarProps {
   onDownload: () => void;
   downloading?: boolean;
+  onOpenTailor: () => void;
 }
 
-const EditorTopBar: FC<IEditorTopBarProps> = ({ onDownload, downloading = false }) => {
+const EditorTopBar: FC<IEditorTopBarProps> = ({
+  onDownload,
+  downloading = false,
+  onOpenTailor,
+}) => {
   const name = useResumeStore((s) => s.name);
   const setName = useResumeStore((s) => s.setName);
   const [editing, setEditing] = useState(false);
@@ -66,6 +71,14 @@ const EditorTopBar: FC<IEditorTopBarProps> = ({ onDownload, downloading = false 
       <div className="flex items-center gap-2 sm:gap-4">
         <AutosaveIndicator />
         <ThemeToggle />
+        <button
+          type="button"
+          onClick={onOpenTailor}
+          className="inline-flex h-9 items-center gap-2 rounded-sm border border-border bg-bg px-2.5 sm:px-3 text-sm font-medium text-ink-soft transition-colors duration-fast ease-out-quart hover:border-border-strong hover:text-ink focus-visible:outline-none"
+        >
+          <HugeiconsIcon icon={AnalyticsUpIcon} size={16} strokeWidth={1.5} />
+          <span className="hidden sm:inline">Tailor</span>
+        </button>
         <button
           type="button"
           onClick={onDownload}

@@ -4,6 +4,7 @@ import {
   Download04Icon,
   FileExportIcon,
   ShieldUserIcon,
+  AnalyticsUpIcon,
 } from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/cn';
 
@@ -12,6 +13,7 @@ interface IExportTabProps {
   onDownloadDocx: () => void;
   onDownloadJson: () => void;
   onAtsCheck: () => void;
+  onOpenTailor: () => void;
   jobDescription: string;
   onChangeJobDescription: (next: string) => void;
   pdfBusy?: boolean;
@@ -24,6 +26,7 @@ const ExportTab: FC<IExportTabProps> = ({
   onDownloadDocx,
   onDownloadJson,
   onAtsCheck,
+  onOpenTailor,
   jobDescription,
   onChangeJobDescription,
   pdfBusy,
@@ -32,6 +35,26 @@ const ExportTab: FC<IExportTabProps> = ({
 }) => {
   return (
     <div className="flex flex-col gap-6 p-4">
+      <section className="flex flex-col gap-3">
+        <h3 className="font-mono text-2xs uppercase tracking-[0.16em] text-muted">Tailor</h3>
+        <button
+          type="button"
+          onClick={onOpenTailor}
+          className="flex w-full items-start gap-3 rounded-sm border border-accent/40 bg-accent-soft/50 p-3 text-left transition-[border-color] duration-fast ease-out-quart hover:border-accent focus-visible:outline-none"
+        >
+          <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xs bg-bg text-accent-ink dark:text-accent">
+            <HugeiconsIcon icon={AnalyticsUpIcon} size={16} strokeWidth={1.5} />
+          </span>
+          <div className="flex-1 min-w-0">
+            <p className="font-sans text-sm font-medium text-ink">Tailor to a job</p>
+            <p className="font-sans text-xs text-ink-soft">
+              Paste a job description. AI rewrites your résumé to match it — you approve every
+              change.
+            </p>
+          </div>
+        </button>
+      </section>
+
       <section className="flex flex-col gap-3">
         <h3 className="font-mono text-2xs uppercase tracking-[0.16em] text-muted">Downloads</h3>
         <ExportButton

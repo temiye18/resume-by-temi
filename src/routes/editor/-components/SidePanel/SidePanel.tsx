@@ -18,6 +18,7 @@ interface ISidePanelProps {
   onDownloadDocx: () => void;
   onDownloadJson: () => void;
   onAtsCheck: () => void;
+  onOpenTailor: () => void;
   jobDescription: string;
   onChangeJobDescription: (next: string) => void;
   pdfBusy?: boolean;
@@ -45,6 +46,7 @@ const SidePanel: FC<ISidePanelProps> = ({
   onDownloadDocx,
   onDownloadJson,
   onAtsCheck,
+  onOpenTailor,
   jobDescription,
   onChangeJobDescription,
   pdfBusy,
@@ -96,6 +98,7 @@ const SidePanel: FC<ISidePanelProps> = ({
           onDownloadDocx={onDownloadDocx}
           onDownloadJson={onDownloadJson}
           onAtsCheck={onAtsCheck}
+          onOpenTailor={onOpenTailor}
           jobDescription={jobDescription}
           onChangeJobDescription={onChangeJobDescription}
           pdfBusy={pdfBusy}

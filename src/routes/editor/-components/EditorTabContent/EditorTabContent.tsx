@@ -11,6 +11,7 @@ interface IEditorTabContentProps {
   onDownloadDocx: () => void;
   onDownloadJson: () => void;
   onAtsCheck: () => void;
+  onOpenTailor: () => void;
   jobDescription: string;
   onChangeJobDescription: (next: string) => void;
   pdfBusy?: boolean;
@@ -24,6 +25,7 @@ const EditorTabContent: FC<IEditorTabContentProps> = ({
   onDownloadDocx,
   onDownloadJson,
   onAtsCheck,
+  onOpenTailor,
   jobDescription,
   onChangeJobDescription,
   pdfBusy,
@@ -40,6 +42,7 @@ const EditorTabContent: FC<IEditorTabContentProps> = ({
         onDownloadDocx={onDownloadDocx}
         onDownloadJson={onDownloadJson}
         onAtsCheck={onAtsCheck}
+        onOpenTailor={onOpenTailor}
         jobDescription={jobDescription}
         onChangeJobDescription={onChangeJobDescription}
         pdfBusy={pdfBusy}

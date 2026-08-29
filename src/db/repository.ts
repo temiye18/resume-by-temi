@@ -2,6 +2,7 @@ import { nanoid } from 'nanoid';
 import { db } from './dexie';
 import type { IResumeRecord } from '@/interfaces/i-resume-record';
 import type { IResumeThemeOverrides } from '@/interfaces/i-resume-theme-overrides';
+import type { IJobTarget } from '@/interfaces/i-job-target';
 import type { Resume } from '@/schema/resume';
 import type { ResumeVariant } from '@/types/resume-variant-type';
 
@@ -60,6 +61,28 @@ export const duplicateResume = async (id: string): Promise<IResumeRecord | null>
     existing.templateId,
     `${existing.name} (copy)`,
   );
+};
+
+export const saveTailoredVersion = async (
+  base: IResumeRecord,
+  resume: Resume,
+  jobTarget: Omit<IJobTarget, 'baseResumeId' | 'tailoredAt'>,
+  name: string,
+): Promise<IResumeRecord> => {
+  const now = new Date().toISOString();
+  const record: IResumeRecord = {
+    id: nanoid(),
+    name,
+    resume,
+    templateId: base.templateId,
+    theme: base.theme,
+    createdAt: now,
+    updatedAt: now,
+    schemaVersion: base.schemaVersion,
+    jobTarget: { ...jobTarget, baseResumeId: base.id, tailoredAt: now },
+  };
+  await db.resumes.put(record);
+  return record;
 };
 
 export const deleteResume = async (id: string): Promise<void> => {

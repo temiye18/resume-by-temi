@@ -11,6 +11,8 @@ export { aiScanFields } from './ai-scan-fields';
 export { aiScanTextLines } from './ai-scan-text-lines';
 export { aiTokenStreamSequence } from './ai-token-stream-sequence';
 export { aiParseSteps } from './ai-parse-steps';
+export { tailorThinkingSteps } from './tailor-thinking-steps';
+export { tailorReasoningLines } from './tailor-reasoning-lines';
 export {
   heroHeadlineParts,
   heroTypewriterCharMs,
