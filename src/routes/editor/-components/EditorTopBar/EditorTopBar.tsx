@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { ArrowLeft01Icon, Download04Icon, AnalyticsUpIcon } from '@hugeicons/core-free-icons';
 import AutosaveIndicator from '../AutosaveIndicator/AutosaveIndicator';
+import UndoRedo from '../UndoRedo/UndoRedo';
 import ThemeToggle from '@/components/ThemeToggle/ThemeToggle';
 import { useResumeStore } from '@/store/resumeStore';
 
@@ -69,6 +70,8 @@ const EditorTopBar: FC<IEditorTopBarProps> = ({
       </div>
 
       <div className="flex items-center gap-2 sm:gap-4">
+        <UndoRedo />
+        <span aria-hidden className="hidden h-5 w-px bg-border sm:block" />
         <AutosaveIndicator />
         <ThemeToggle />
         <button

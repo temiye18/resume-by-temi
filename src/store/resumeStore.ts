@@ -52,12 +52,29 @@ export const useResumeStore = create<IResumeState>()(
         templateId: state.templateId,
         theme: state.theme,
       }),
+      // Only the four tracked fields matter. Immer returns a stable reference when a
+      // mutation changes nothing, so referential equality here means "no real edit" —
+      // which keeps autosave's setSaving/setLastSavedAt writes out of the history and
+      // stops them from wiping the redo stack.
+      equality: (a, b) =>
+        a.resume === b.resume &&
+        a.name === b.name &&
+        a.templateId === b.templateId &&
+        a.theme === b.theme,
+      // Leading-edge grouping: record the pre-burst state on the first real change
+      // (so undo is available instantly), then coalesce further changes for 500ms so a
+      // run of keystrokes collapses into one undo step.
       handleSet: (handleSet) => {
+        let cooling = false;
         let timer: ReturnType<typeof setTimeout> | null = null;
         return (pastState) => {
+          if (!cooling) {
+            handleSet(pastState);
+            cooling = true;
+          }
           if (timer) clearTimeout(timer);
           timer = setTimeout(() => {
-            handleSet(pastState);
+            cooling = false;
             timer = null;
           }, 500);
         };

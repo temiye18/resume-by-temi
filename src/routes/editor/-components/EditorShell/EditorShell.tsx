@@ -8,7 +8,7 @@ import EditorTabContent from '../EditorTabContent/EditorTabContent';
 import MobileTabBar from '../MobileTabBar/MobileTabBar';
 import AtsCheckModal from '../AtsCheckModal/AtsCheckModal';
 import TailorDrawer from '../TailorDrawer/TailorDrawer';
-import { useResumeStore } from '@/store/resumeStore';
+import { useResumeStore, useResumeTemporal } from '@/store/resumeStore';
 import { getResume } from '@/db/repository';
 import { startAutosave, stopAutosave, flushAutosaveNow } from '@/store/middleware/autosave';
 import { generatePdf } from '@/pdf/generatePdf';
@@ -59,7 +59,11 @@ const EditorShell: FC<IEditorShellProps> = ({ resumeId }) => {
         setLoadState('missing');
         return;
       }
+      const temporal = useResumeTemporal.getState();
+      temporal.pause();
       load(record);
+      temporal.clear();
+      temporal.resume();
       setLoadState('ready');
       startAutosave();
     })();
