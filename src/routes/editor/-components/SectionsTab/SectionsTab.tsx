@@ -13,6 +13,7 @@ import { useResumeStore } from '@/store/resumeStore';
 import { newId } from '@/schema/resume';
 import { cn } from '@/lib/cn';
 import RichTextField from '@/components/RichTextField/RichTextField';
+import RefineControl from '@/components/RefineControl/RefineControl';
 import SortableList from '@/components/SortableList/SortableList';
 import SortableEntry from '@/components/SortableEntry/SortableEntry';
 import type { IDragHandleProps } from '@/interfaces/i-drag-handle-props';
@@ -401,6 +402,8 @@ const SectionsTab: FC = () => {
           minHeight={80}
           ariaLabel="Summary"
           blockFormats
+          refineKind="summary"
+          refineContext={`Professional summary for ${resume.basics.label || 'this candidate'}`}
         />
       </section>
 
@@ -516,18 +519,31 @@ const SectionsTab: FC = () => {
                   }
                 />
               </div>
-              <Field
-                label="Company summary"
-                value={entry.summary ?? ''}
-                placeholder="One or two lines about what the company does and its scale"
-                multiline
-                rows={2}
-                onChange={(v) =>
-                  patchResume((d) => {
-                    d.work[i].summary = v || undefined;
-                  })
-                }
-              />
+              <div className="flex flex-col gap-1">
+                <Field
+                  label="Company summary"
+                  value={entry.summary ?? ''}
+                  placeholder="One or two lines about what the company does and its scale"
+                  multiline
+                  rows={2}
+                  onChange={(v) =>
+                    patchResume((d) => {
+                      d.work[i].summary = v || undefined;
+                    })
+                  }
+                />
+                <RefineControl
+                  kind="description"
+                  context={`Company summary for ${entry.name || 'a company'}`}
+                  disabled={(entry.summary?.trim().length ?? 0) < 8}
+                  getText={() => entry.summary ?? ''}
+                  onAccept={(refined) =>
+                    patchResume((d) => {
+                      d.work[i].summary = refined || undefined;
+                    })
+                  }
+                />
+              </div>
               <div>
                 <SectionHeading>Bullets</SectionHeading>
                 <div className="mt-2">
@@ -538,6 +554,8 @@ const SectionsTab: FC = () => {
                         d.work[i].highlights = next;
                       })
                     }
+                    refineKind="bullet"
+                    refineContext={`Résumé bullet for ${entry.position || 'a role'} at ${entry.name || 'a company'}`}
                   />
                 </div>
               </div>
@@ -638,18 +656,31 @@ const SectionsTab: FC = () => {
                   })
                 }
               />
-              <Field
-                label="Description"
-                value={entry.description ?? ''}
-                placeholder="What the project is, who it's for, and how it works"
-                multiline
-                rows={3}
-                onChange={(v) =>
-                  patchResume((d) => {
-                    d.projects[i].description = v;
-                  })
-                }
-              />
+              <div className="flex flex-col gap-1">
+                <Field
+                  label="Description"
+                  value={entry.description ?? ''}
+                  placeholder="What the project is, who it's for, and how it works"
+                  multiline
+                  rows={3}
+                  onChange={(v) =>
+                    patchResume((d) => {
+                      d.projects[i].description = v;
+                    })
+                  }
+                />
+                <RefineControl
+                  kind="description"
+                  context={`Description of the project “${entry.name || 'Untitled'}”`}
+                  disabled={(entry.description?.trim().length ?? 0) < 8}
+                  getText={() => entry.description ?? ''}
+                  onAccept={(refined) =>
+                    patchResume((d) => {
+                      d.projects[i].description = refined;
+                    })
+                  }
+                />
+              </div>
               <Field
                 label="Website"
                 type="text"
@@ -702,6 +733,8 @@ const SectionsTab: FC = () => {
                         d.projects[i].highlights = next;
                       })
                     }
+                    refineKind="bullet"
+                    refineContext={`Résumé bullet for the project “${entry.name || 'Untitled'}”`}
                   />
                 </div>
               </div>

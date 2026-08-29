@@ -2,14 +2,23 @@ import { type FC } from 'react';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { Delete02Icon, PlusSignIcon } from '@hugeicons/core-free-icons';
 import RichTextField from '@/components/RichTextField/RichTextField';
+import type { RefineKind } from '@/types/refine-kind-type';
 
 interface IBulletListProps {
   bullets: string[];
   onChange: (next: string[]) => void;
   placeholder?: string;
+  refineKind?: RefineKind;
+  refineContext?: string;
 }
 
-const BulletList: FC<IBulletListProps> = ({ bullets, onChange, placeholder }) => {
+const BulletList: FC<IBulletListProps> = ({
+  bullets,
+  onChange,
+  placeholder,
+  refineKind,
+  refineContext,
+}) => {
   return (
     <div className="flex flex-col gap-2">
       {bullets.map((b, i) => (
@@ -28,6 +37,8 @@ const BulletList: FC<IBulletListProps> = ({ bullets, onChange, placeholder }) =>
             singleLine={false}
             className="flex-1"
             minHeight={36}
+            refineKind={refineKind}
+            refineContext={refineContext}
           />
           <button
             type="button"

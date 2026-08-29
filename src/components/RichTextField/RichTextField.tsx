@@ -14,6 +14,8 @@ import {
   Cancel01Icon,
 } from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/cn';
+import RefineControl from '@/components/RefineControl/RefineControl';
+import type { RefineKind } from '@/types/refine-kind-type';
 
 interface IRichTextFieldProps {
   value: string;
@@ -24,6 +26,8 @@ interface IRichTextFieldProps {
   className?: string;
   minHeight?: number;
   ariaLabel?: string;
+  refineKind?: RefineKind;
+  refineContext?: string;
 }
 
 const RichTextField: FC<IRichTextFieldProps> = ({
@@ -35,6 +39,8 @@ const RichTextField: FC<IRichTextFieldProps> = ({
   className,
   minHeight,
   ariaLabel,
+  refineKind,
+  refineContext,
 }) => {
   const [linkOpen, setLinkOpen] = useState(false);
   const [linkInput, setLinkInput] = useState('');
@@ -209,6 +215,22 @@ const RichTextField: FC<IRichTextFieldProps> = ({
       </BubbleMenu>
 
       <EditorContent editor={editor} className="px-2.5 py-2" />
+
+      {refineKind ? (
+        <div className="px-2 pb-1.5 pt-0.5">
+          <RefineControl
+            kind={refineKind}
+            context={refineContext}
+            disabled={(value?.trim().length ?? 0) < 8}
+            getText={() => editor.storage.markdown.getMarkdown() as string}
+            onAccept={(refined) => {
+              editor.commands.setContent(refined, false);
+              const md = editor.storage.markdown.getMarkdown() as string;
+              onChange(singleLine ? md.replace(/\n+/g, ' ').trim() : md);
+            }}
+          />
+        </div>
+      ) : null}
     </div>
   );
 };

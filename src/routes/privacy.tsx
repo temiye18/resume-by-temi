@@ -74,9 +74,9 @@ const PrivacyPage: FC = () => {
               }}
             >
               <p>
-                There are two opt-in places in the product where résumé content leaves your
-                browser, and both are things you choose to start. The first is the Smart parse
-                button on the dashboard's import card. When you choose Smart parse, the file you
+                There are three opt-in places in the product where résumé content leaves your
+                browser, and all of them are things you choose to start. The first is the Smart
+                parse button on the dashboard's import card. When you choose Smart parse, the file you
                 drop in (your old PDF or DOCX) is sent to Google's Gemini API so it can read the
                 layout, headings, and dates and return structured fields. We never see the file
                 ourselves; the call goes through a Cloudflare Pages Function that holds our API
@@ -97,6 +97,14 @@ const PrivacyPage: FC = () => {
                 Nothing is applied until you accept it, and nothing about the tailoring is logged
                 or stored on our side. The instant match score shown before you enhance is
                 computed entirely in your browser, with no network call.
+              </p>
+              <p>
+                The third is Refine, the small control under a description field in the editor.
+                When you use it, only the text of that one field (plus a short note of what kind
+                of field it is) is sent through the same Cloudflare Function to Gemini, which
+                streams back two sharper versions to choose from. It never invents facts, nothing
+                is stored on our side, and a rewrite replaces your text only when you choose
+                “Use this”.
               </p>
               <p>
                 If you'd rather not involve Gemini, the import card has a small secondary link

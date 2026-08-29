@@ -6,11 +6,13 @@ import { VitePWA } from 'vite-plugin-pwa';
 import path from 'node:path';
 import { parseResumeDevPlugin } from './server/parse-resume-dev-plugin';
 import { tailorResumeDevPlugin } from './server/tailor-resume-dev-plugin';
+import { refineTextDevPlugin } from './server/refine-text-dev-plugin';
 
 export default defineConfig({
   plugins: [
     parseResumeDevPlugin(),
     tailorResumeDevPlugin(),
+    refineTextDevPlugin(),
     TanStackRouterVite({ target: 'react', autoCodeSplitting: true }),
     react(),
     tailwindcss(),
