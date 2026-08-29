@@ -9,6 +9,6 @@ export const tailorReasoningLines: string[] = [
   '> aligning language to JD keywords',
   '> drafting rewrite · preserving your facts',
   '  ↳ no new claims · truthful only',
-  '> validating against ATS ruleset R1–R24',
+  '> checking against ATS rules',
   '> composing suggestion …',
 ];

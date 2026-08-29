@@ -26,22 +26,59 @@ OUTPUT FORMAT — NDJSON, and nothing else:
 - Only reference work "id"s, project "id"s, and highlight indices that exist in the provided resume. Never fabricate an id.
 - Bullets must be one line, start with a strong past-tense action verb, and contain no leading dash or bullet character.`;
 
+export const ATS_SYSTEM_INSTRUCTION = `You are a senior resume editor improving a candidate's existing resume so it scores higher on an Applicant Tracking System (ATS) check.
+
+You receive: (1) the candidate's resume as JSON — each work entry has an "id" and a "highlights" array (bullets addressed by their 0-based index); each project has an "id"; (2) a list of specific issues an automated ATS checker found. Propose focused edits that fix those issues.
+
+ABSOLUTE HONESTY RULES — non-negotiable:
+- NEVER invent employers, titles, dates, degrees, certifications, metrics, or technologies the candidate has not stated.
+- Only rephrase, strengthen, and re-order facts already present: sharpen weak phrasing, lead bullets with a strong past-tense action verb, use active voice, drop first person, and tighten wordy lines.
+- If a bullet would be stronger with a number the resume does not contain, keep it truthful and insert the literal token [add metric] where the candidate should fill one in, and set "placeholder": true.
+
+Map each edit to a reported issue — unquantified bullets -> add [add metric]; passive/weak/first-person phrasing -> rewrite active and third person; thin summary -> expand to 2-3 sentences; wordy or too long -> tighten.
+
+OUTPUT FORMAT — NDJSON, and nothing else:
+- Emit ONE JSON object per line. No prose, no markdown, no code fences, no wrapping array.
+- 6-14 of the highest-impact edits, most impactful first.
+- Shapes (include only the fields listed for that op):
+  {"op":"rewrite-summary","after":"<full rewritten summary, 2-3 sentences>","reason":"<which ATS issue this closes>","placeholder":false}
+  {"op":"replace-bullet","workId":"<id>","index":<n>,"after":"<rewritten bullet>","reason":"<short why>","placeholder":false}
+  {"op":"add-bullet","workId":"<id>","after":"<new truthful bullet, may use [add metric]>","reason":"<short why>","placeholder":true}
+  {"op":"replace-project-bullet","projectId":"<id>","index":<n>,"after":"<rewritten bullet>","reason":"<short why>"}
+  {"op":"add-skill","group":"<existing or sensible skill group name>","skill":"<skill the resume already demonstrates>","reason":"...","confirm":true}
+- "reason" is short (max ~14 words) and names the ATS issue it closes.
+- Only reference work "id"s, project "id"s, and highlight indices that exist. Bullets are one line, start with a strong past-tense action verb, and have no leading dash.`;
+
 export interface ITailorArgs {
   apiKey: string;
   resumeJson: string;
-  jobDescription: string;
+  jobDescription?: string;
   jobTitle?: string;
   company?: string;
   focusFindings?: string[];
+  mode?: 'job' | 'ats';
 }
 
 const buildRequestBody = (args: ITailorArgs): unknown => {
+  if (args.mode === 'ats') {
+    const findings =
+      args.focusFindings && args.focusFindings.length > 0
+        ? args.focusFindings.map((f) => `- ${f}`).join('\n')
+        : '- General ATS quality: strong action verbs, quantified impact, active voice, a fuller summary.';
+    const userText = `ATS issues to fix:\n${findings}\n\nCANDIDATE RESUME (JSON):\n${args.resumeJson}\n\nReturn NDJSON suggestions now.`;
+    return {
+      systemInstruction: { parts: [{ text: ATS_SYSTEM_INSTRUCTION }] },
+      contents: [{ role: 'user', parts: [{ text: userText }] }],
+      generationConfig: { temperature: 0.35, responseMimeType: 'text/plain' },
+    };
+  }
+
   const targetLine = [args.jobTitle, args.company].filter(Boolean).join(' at ');
   const findings =
     args.focusFindings && args.focusFindings.length > 0
       ? `\n\nAn automated ATS checker flagged these weaknesses — prioritise closing them:\n- ${args.focusFindings.join('\n- ')}`
       : '';
-  const userText = `Target role: ${targetLine || '(not specified)'}\n\nJOB DESCRIPTION:\n${args.jobDescription}\n\nCANDIDATE RESUME (JSON):\n${args.resumeJson}${findings}\n\nReturn NDJSON suggestions now.`;
+  const userText = `Target role: ${targetLine || '(not specified)'}\n\nJOB DESCRIPTION:\n${args.jobDescription ?? ''}\n\nCANDIDATE RESUME (JSON):\n${args.resumeJson}${findings}\n\nReturn NDJSON suggestions now.`;
   return {
     systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
     contents: [{ role: 'user', parts: [{ text: userText }] }],

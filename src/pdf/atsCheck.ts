@@ -202,7 +202,7 @@ export const atsCheck = async (
   } catch (e) {
     findings.push({
       severity: 'error',
-      rule: 'R1 · selectable text',
+      rule: 'Selectable text',
       message: `Could not extract text from the PDF. ${e instanceof Error ? e.message : ''}`,
     });
     return { passed: false, score: 0, findings, meta };
@@ -213,7 +213,7 @@ export const atsCheck = async (
   if (parsed.text.trim().length < 200) {
     findings.push({
       severity: 'error',
-      rule: 'R1 · selectable text',
+      rule: 'Selectable text',
       message: 'Extracted text is too short. This may indicate a rasterized PDF.',
     });
     score.deduct(40);
@@ -222,7 +222,7 @@ export const atsCheck = async (
   if (resume.basics.name && !normalized.includes(normalize(resume.basics.name))) {
     findings.push({
       severity: 'error',
-      rule: 'R2 · name in text layer',
+      rule: 'Name in text layer',
       message: `Could not find "${resume.basics.name}" in the extracted text.`,
     });
     score.deduct(15);
@@ -231,21 +231,21 @@ export const atsCheck = async (
   if (!resume.basics.email) {
     findings.push({
       severity: 'warning',
-      rule: 'R4 · contact essentials',
+      rule: 'Contact essentials',
       message: 'No email address is set — most ATS systems require one.',
     });
     score.deduct(8);
   } else if (!EMAIL_RE.test(resume.basics.email)) {
     findings.push({
       severity: 'warning',
-      rule: 'R4 · contact essentials',
+      rule: 'Contact essentials',
       message: `"${resume.basics.email}" does not look like a valid email address.`,
     });
     score.deduct(5);
   } else if (!normalized.includes(normalize(resume.basics.email))) {
     findings.push({
       severity: 'warning',
-      rule: 'R4 · contact essentials',
+      rule: 'Contact essentials',
       message: 'Email address not found in extracted text.',
     });
     score.deduct(5);
@@ -254,14 +254,14 @@ export const atsCheck = async (
   if (!resume.basics.phone) {
     findings.push({
       severity: 'warning',
-      rule: 'R4 · contact essentials',
+      rule: 'Contact essentials',
       message: 'No phone number is set — most ATS systems will downscore.',
     });
     score.deduct(4);
   } else if (!PHONE_RE.test(resume.basics.phone)) {
     findings.push({
       severity: 'warning',
-      rule: 'R4 · contact essentials',
+      rule: 'Contact essentials',
       message: `"${resume.basics.phone}" does not look like a parseable phone number.`,
     });
     score.deduct(3);
@@ -277,7 +277,7 @@ export const atsCheck = async (
     if (s.flag && !normalized.includes(normalize(s.label))) {
       findings.push({
         severity: 'warning',
-        rule: 'R3 · standard heading',
+        rule: 'Standard heading',
         message: `The "${s.label}" heading was expected but not found in the extracted text.`,
       });
       score.deduct(4);
@@ -288,7 +288,7 @@ export const atsCheck = async (
     if (!URL_RE.test(profile.url)) {
       findings.push({
         severity: 'warning',
-        rule: 'R5 · profile URL format',
+        rule: 'Profile URL format',
         message: `Profile link "${profile.url || '(empty)'}" is missing or malformed.`,
       });
       score.deduct(2);
@@ -300,7 +300,7 @@ export const atsCheck = async (
     if (RESERVED_SECTION_WORDS.has(norm)) {
       findings.push({
         severity: 'warning',
-        rule: 'R6 · skill group naming',
+        rule: 'Skill group naming',
         message: `Skill group "${group.name}" collides with a standard resume section — many ATS will read it as a new section. Try "Programming Languages", "Tools & Platforms", "Domain Skills", etc.`,
       });
       score.deduct(6);
@@ -310,7 +310,7 @@ export const atsCheck = async (
   if (resume.work.length === 0) {
     findings.push({
       severity: 'warning',
-      rule: 'R7 · work history',
+      rule: 'Work history',
       message: 'No work history. Most ATS scoring engines weight Experience heavily.',
     });
     score.deduct(10);
@@ -328,14 +328,14 @@ export const atsCheck = async (
     if (entry.highlights.length === 0) {
       findings.push({
         severity: 'warning',
-        rule: 'R8 · bullets per role',
+        rule: 'Bullets per role',
         message: `"${entry.position || entry.name || 'Untitled role'}" has no bullet points. Recruiters and ATS expect 2–5 per role.`,
       });
       score.deduct(3);
     } else if (entry.highlights.length < 2) {
       findings.push({
         severity: 'info',
-        rule: 'R8 · bullets per role',
+        rule: 'Bullets per role',
         message: `"${entry.position || entry.name}" has only ${entry.highlights.length} bullet. Aim for 2–5.`,
       });
       score.deduct(1);
@@ -361,7 +361,7 @@ export const atsCheck = async (
     if (bulletsMatched / bulletsTotal < 0.7) {
       findings.push({
         severity: 'warning',
-        rule: 'R1 · bullet recoverability',
+        rule: 'Bullet recoverability',
         message: `Only ${bulletsMatched} of ${bulletsTotal} sampled bullets were recoverable from the text layer.`,
       });
       score.deduct(8);
@@ -369,7 +369,7 @@ export const atsCheck = async (
     if (actionVerbBullets / bulletsTotal < 0.7) {
       findings.push({
         severity: 'info',
-        rule: 'R9 · action verbs',
+        rule: 'Action verbs',
         message: `Only ${actionVerbBullets} of ${bulletsTotal} bullets begin with a strong action verb (led, built, launched, …).`,
       });
       score.deduct(6);
@@ -377,7 +377,7 @@ export const atsCheck = async (
     if (quantifiedBullets / bulletsTotal < 0.3) {
       findings.push({
         severity: 'info',
-        rule: 'R10 · quantified impact',
+        rule: 'Quantified impact',
         message: `Only ${quantifiedBullets} of ${bulletsTotal} bullets include a number, %, or unit. ATS keyword scoring favors quantified wins.`,
       });
       score.deduct(5);
@@ -385,7 +385,7 @@ export const atsCheck = async (
     if (firstPersonBullets > 0) {
       findings.push({
         severity: 'warning',
-        rule: 'R15 · third-person voice',
+        rule: 'Third-person voice',
         message: `${firstPersonBullets} bullet(s) use first person ("I", "my"). Resume bullets should be action-led (e.g. "Led", "Built").`,
       });
       score.deduct(3 * firstPersonBullets, 9);
@@ -393,7 +393,7 @@ export const atsCheck = async (
     if (weakVoiceBullets > 0) {
       findings.push({
         severity: 'info',
-        rule: 'R16 · strong phrasing',
+        rule: 'Strong phrasing',
         message: `${weakVoiceBullets} bullet(s) use weak phrases ("responsible for", "worked on", "duties included"). Rewrite with the impact you delivered.`,
       });
       score.deduct(2 * weakVoiceBullets, 8);
@@ -401,7 +401,7 @@ export const atsCheck = async (
     if (passiveBullets / bulletsTotal > 0.25) {
       findings.push({
         severity: 'info',
-        rule: 'R17 · active voice',
+        rule: 'Active voice',
         message: `${passiveBullets} of ${bulletsTotal} bullets read passive ("was implemented", "were managed"). Recruiters and ATS weight active voice higher.`,
       });
       score.deduct(4);
@@ -413,23 +413,23 @@ export const atsCheck = async (
     if (entry.position && !normalized.includes(normalize(entry.position))) {
       findings.push({
         severity: 'warning',
-        rule: 'R18 · role round-trip',
-        message: `Role "${entry.position}" did not round-trip through the PDF text layer.`,
+        rule: 'Role in the PDF',
+        message: `Role "${entry.position}" was not found in the PDF text layer.`,
       });
       score.deduct(3, 12);
     }
     if (entry.name && !normalized.includes(normalize(entry.name))) {
       findings.push({
         severity: 'warning',
-        rule: 'R18 · company round-trip',
-        message: `Company "${entry.name}" (under "${role}") did not round-trip through the PDF text layer.`,
+        rule: 'Company in the PDF',
+        message: `Company "${entry.name}" (under "${role}") was not found in the PDF text layer.`,
       });
       score.deduct(3, 12);
     }
     if (!entry.startDate) {
       findings.push({
         severity: 'warning',
-        rule: 'R11 · role dates',
+        rule: 'Role dates',
         message: `"${role}" is missing a start date.`,
       });
       score.deduct(3);
@@ -437,7 +437,7 @@ export const atsCheck = async (
     if (!entry.endDate) {
       findings.push({
         severity: 'info',
-        rule: 'R11 · role dates',
+        rule: 'Role dates',
         message: `"${role}" has no end date. Use "Present" if you still work there.`,
       });
       score.deduct(1);
@@ -448,8 +448,8 @@ export const atsCheck = async (
     if (entry.institution && !normalized.includes(normalize(entry.institution))) {
       findings.push({
         severity: 'warning',
-        rule: 'R18 · school round-trip',
-        message: `School "${entry.institution}" did not round-trip through the PDF text layer.`,
+        rule: 'School in the PDF',
+        message: `School "${entry.institution}" was not found in the PDF text layer.`,
       });
       score.deduct(3, 9);
     }
@@ -465,7 +465,7 @@ export const atsCheck = async (
   if (dateFormats.size > 1) {
     findings.push({
       severity: 'info',
-      rule: 'R19 · date consistency',
+      rule: 'Date consistency',
       message: `Mixed date formats found (${[...dateFormats].join(', ')}). Keep every role on the same precision (YYYY-MM is recommended).`,
     });
     score.deduct(3);
@@ -476,7 +476,7 @@ export const atsCheck = async (
     if (summaryLen < 80) {
       findings.push({
         severity: 'info',
-        rule: 'R12 · summary depth',
+        rule: 'Summary depth',
         message: `Summary is ${summaryLen} characters. Aim for 200–400 to load it with keywords ATS engines weight heavily.`,
       });
       score.deduct(3);
@@ -484,7 +484,7 @@ export const atsCheck = async (
   } else {
     findings.push({
       severity: 'info',
-      rule: 'R12 · summary depth',
+      rule: 'Summary depth',
       message: 'No summary set. A 2–3 line summary above experience boosts keyword density.',
     });
     score.deduct(2);
@@ -493,7 +493,7 @@ export const atsCheck = async (
   if (resume.skills.reduce((acc, g) => acc + g.keywords.length, 0) < 8) {
     findings.push({
       severity: 'info',
-      rule: 'R13 · skill density',
+      rule: 'Skill density',
       message: 'Fewer than 8 skills listed. ATS keyword scoring rewards 10–25 well-chosen skills.',
     });
     score.deduct(3);
@@ -502,7 +502,7 @@ export const atsCheck = async (
   if (resume.education.length === 0) {
     findings.push({
       severity: 'info',
-      rule: 'R14 · education',
+      rule: 'Education',
       message: 'No education entry. Most ATS expect at least one.',
     });
     score.deduct(2);
@@ -511,7 +511,7 @@ export const atsCheck = async (
   if (parsed.pageCount > 2) {
     findings.push({
       severity: 'warning',
-      rule: 'R20 · length',
+      rule: 'Length',
       message: `${parsed.pageCount} pages. Most recruiters and ATS scoring engines expect 1–2 pages.`,
     });
     score.deduct(4);
@@ -519,14 +519,14 @@ export const atsCheck = async (
   if (parsed.wordCount < 250) {
     findings.push({
       severity: 'info',
-      rule: 'R20 · length',
+      rule: 'Length',
       message: `${parsed.wordCount} words. Real-content resumes land at 350–700 — ATS keyword scoring favors density.`,
     });
     score.deduct(3);
   } else if (parsed.wordCount > 900) {
     findings.push({
       severity: 'info',
-      rule: 'R20 · length',
+      rule: 'Length',
       message: `${parsed.wordCount} words. Above ~900 the keyword signal/noise ratio drops; tighten lower-impact bullets.`,
     });
     score.deduct(2);
@@ -535,7 +535,7 @@ export const atsCheck = async (
   if (parsed.totalFonts > 0 && parsed.embeddedFonts < parsed.totalFonts) {
     findings.push({
       severity: 'error',
-      rule: 'R21 · fonts embedded',
+      rule: 'Fonts embedded',
       message: `${parsed.totalFonts - parsed.embeddedFonts} font(s) appear unembedded. Some ATS parsers replace glyphs with question marks when a font isn't embedded.`,
     });
     score.deduct(10);
@@ -544,7 +544,7 @@ export const atsCheck = async (
   if (!parsed.meta.title) {
     findings.push({
       severity: 'info',
-      rule: 'R22 · PDF metadata',
+      rule: 'PDF metadata',
       message: 'PDF has no Title metadata. Some ATS systems read it as a backup for the candidate name.',
     });
     score.deduct(1);
@@ -552,7 +552,7 @@ export const atsCheck = async (
   if (!parsed.meta.author) {
     findings.push({
       severity: 'info',
-      rule: 'R22 · PDF metadata',
+      rule: 'PDF metadata',
       message: 'PDF has no Author metadata. Set basics.name and re-export.',
     });
     score.deduct(1);
@@ -590,21 +590,21 @@ export const atsCheck = async (
     if (coverage < 0.4) {
       findings.push({
         severity: 'warning',
-        rule: 'R23 · JD keyword match',
-        message: `Resume covers ${pct}% of the job description (${rawMatched}/${jdRawKeywords.size} raw keywords, ${taxonomyHits.length}/${jdSkills.size} canonical skills). Below 50% rarely clears keyword filters.`,
+        rule: 'Job-description match',
+        message: `Resume covers ${pct}% of the job description (${rawMatched}/${jdRawKeywords.size} raw keywords, ${taxonomyHits.length}/${jdSkills.size} recognized skills). Below 50% rarely clears keyword filters.`,
       });
       score.deduct(15);
     } else if (coverage < 0.6) {
       findings.push({
         severity: 'info',
-        rule: 'R23 · JD keyword match',
-        message: `Resume covers ${pct}% of the job description (${taxonomyHits.length}/${jdSkills.size} canonical skills). Aim for 60%+ to clear most filters.`,
+        rule: 'Job-description match',
+        message: `Resume covers ${pct}% of the job description (${taxonomyHits.length}/${jdSkills.size} recognized skills). Aim for 60%+ to clear most filters.`,
       });
       score.deduct(8);
     } else if (coverage < 0.75) {
       findings.push({
         severity: 'info',
-        rule: 'R23 · JD keyword match',
+        rule: 'Job-description match',
         message: `Resume covers ${pct}% of the job description. Add the missing 25% to push past 75%.`,
       });
       score.deduct(3);
@@ -620,8 +620,8 @@ export const atsCheck = async (
       }
       findings.push({
         severity: 'info',
-        rule: 'R24 · missing canonical skills',
-        message: `JD calls out skills your resume doesn't mention. ${lines.join(' · ')}`,
+        rule: 'Missing skills',
+        message: `The job description lists skills your resume doesn't mention. ${lines.join(' · ')}`,
       });
     }
 
@@ -632,8 +632,8 @@ export const atsCheck = async (
       if (topRaw.length > 0) {
         findings.push({
           severity: 'info',
-          rule: 'R23 · other JD terms',
-          message: `Other terms from the JD worth mirroring: ${topRaw.join(', ')}.`,
+          rule: 'Other job-description terms',
+          message: `Other terms from the job description worth mirroring: ${topRaw.join(', ')}.`,
         });
       }
     }
@@ -642,7 +642,7 @@ export const atsCheck = async (
   if (resumeSkills.size < 5) {
     findings.push({
       severity: 'info',
-      rule: 'R24 · canonical skill recognition',
+      rule: 'Recognized skills',
       message: `Only ${resumeSkills.size} skills in our taxonomy were recognized in your resume text. Add named tools, frameworks, methodologies — ATS keyword scoring weights recognized industry skills higher than free text.`,
     });
     score.deduct(4);

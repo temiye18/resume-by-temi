@@ -6,6 +6,7 @@ import {
   Alert01Icon,
   Cancel01Icon,
   AnalyticsUpIcon,
+  AiMagicIcon,
 } from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/cn';
 import type { IAtsCheckResult } from '@/interfaces/i-ats-check-result';
@@ -15,9 +16,10 @@ interface IAtsCheckModalProps {
   busy: boolean;
   result: IAtsCheckResult | null;
   onClose: () => void;
+  onImprove?: (result: IAtsCheckResult) => void;
 }
 
-const AtsCheckModal: FC<IAtsCheckModalProps> = ({ open, busy, result, onClose }) => {
+const AtsCheckModal: FC<IAtsCheckModalProps> = ({ open, busy, result, onClose, onImprove }) => {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -56,7 +58,7 @@ const AtsCheckModal: FC<IAtsCheckModalProps> = ({ open, busy, result, onClose })
                 <BusyState />
               </div>
             ) : result ? (
-              <ResultState result={result} onClose={onClose} />
+              <ResultState result={result} onClose={onClose} onImprove={onImprove} />
             ) : null}
           </m.div>
         </m.div>
@@ -87,7 +89,11 @@ const BusyState: FC = () => (
   </div>
 );
 
-const ResultState: FC<{ result: IAtsCheckResult; onClose: () => void }> = ({ result, onClose }) => {
+const ResultState: FC<{
+  result: IAtsCheckResult;
+  onClose: () => void;
+  onImprove?: (result: IAtsCheckResult) => void;
+}> = ({ result, onClose, onImprove }) => {
   const errors = result.findings.filter((f) => f.severity === 'error');
   const warnings = result.findings.filter((f) => f.severity === 'warning');
 
@@ -179,11 +185,21 @@ const ResultState: FC<{ result: IAtsCheckResult; onClose: () => void }> = ({ res
         )}
       </div>
 
-      <div className="border-t border-border/60 px-6 py-3">
+      <div className="flex items-center justify-between gap-3 border-t border-border/60 px-6 py-3">
         <p className="font-mono text-2xs tabular-nums text-muted">
           {result.meta.sections} sections · {result.meta.bullets} bullets ·{' '}
           {result.meta.sizeKb} KB
         </p>
+        {onImprove && result.findings.length > 0 ? (
+          <button
+            type="button"
+            onClick={() => onImprove(result)}
+            className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-sm bg-ink px-3 font-sans text-xs font-medium text-bg transition-[background-color] duration-fast ease-out-quart hover:bg-accent focus-visible:outline-none"
+          >
+            <HugeiconsIcon icon={AiMagicIcon} size={14} strokeWidth={1.5} />
+            Improve with AI
+          </button>
+        ) : null}
       </div>
     </div>
   );

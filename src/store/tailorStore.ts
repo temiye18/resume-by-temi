@@ -7,11 +7,14 @@ const MIN_JD_LENGTH = 40;
 let controller: AbortController | null = null;
 
 export const useTailorStore = create<ITailorState>((set, get) => ({
+  mode: 'job',
   status: 'idle',
   jobDescription: '',
   jobTitle: '',
   company: '',
   match: null,
+  atsScore: null,
+  atsFindings: [],
   suggestions: [],
   decisions: {},
   error: null,
@@ -20,14 +23,27 @@ export const useTailorStore = create<ITailorState>((set, get) => ({
   setJobTitle: (value) => set({ jobTitle: value }),
   setCompany: (value) => set({ company: value }),
 
+  openForAts: (score, findings) =>
+    set({
+      mode: 'ats',
+      atsScore: score,
+      atsFindings: findings,
+      status: 'idle',
+      match: null,
+      suggestions: [],
+      decisions: {},
+      error: null,
+    }),
+
   analyze: (resume) => {
     const jd = get().jobDescription.trim();
     set({ match: jd.length < MIN_JD_LENGTH ? null : analyzeJobMatch(resume, jd) });
   },
 
   start: async (resume, focusFindings) => {
+    const mode = get().mode;
     const jd = get().jobDescription.trim();
-    if (jd.length < MIN_JD_LENGTH) {
+    if (mode === 'job' && jd.length < MIN_JD_LENGTH) {
       set({ status: 'error', error: 'Paste a job description first (a sentence or two is enough).' });
       return;
     }
@@ -38,18 +54,28 @@ export const useTailorStore = create<ITailorState>((set, get) => ({
       suggestions: [],
       decisions: {},
       error: null,
-      match: analyzeJobMatch(resume, jd),
+      match: mode === 'job' ? analyzeJobMatch(resume, jd) : null,
     });
 
+    const request =
+      mode === 'ats'
+        ? {
+            resume,
+            mode: 'ats' as const,
+            focusFindings: focusFindings ?? get().atsFindings,
+            signal: controller.signal,
+          }
+        : {
+            resume,
+            jobDescription: jd,
+            jobTitle: get().jobTitle.trim() || undefined,
+            company: get().company.trim() || undefined,
+            focusFindings,
+            signal: controller.signal,
+          };
+
     try {
-      for await (const suggestion of streamTailorSuggestions({
-        resume,
-        jobDescription: jd,
-        jobTitle: get().jobTitle.trim() || undefined,
-        company: get().company.trim() || undefined,
-        focusFindings,
-        signal: controller.signal,
-      })) {
+      for await (const suggestion of streamTailorSuggestions(request)) {
         set((state) => ({
           suggestions: [...state.suggestions, suggestion],
           decisions: { ...state.decisions, [suggestion.id]: 'pending' },
@@ -63,7 +89,7 @@ export const useTailorStore = create<ITailorState>((set, get) => ({
       }
       set({
         status: 'error',
-        error: err instanceof Error ? err.message : 'AI tailoring failed. Please try again.',
+        error: err instanceof Error ? err.message : 'AI failed. Please try again.',
       });
     }
   },
@@ -89,11 +115,14 @@ export const useTailorStore = create<ITailorState>((set, get) => ({
     controller?.abort();
     controller = null;
     set({
+      mode: 'job',
       status: 'idle',
       jobDescription: '',
       jobTitle: '',
       company: '',
       match: null,
+      atsScore: null,
+      atsFindings: [],
       suggestions: [],
       decisions: {},
       error: null,

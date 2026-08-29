@@ -208,6 +208,17 @@
       0 0 0 2px var(--ring-offset),
       0 0 0 4px var(--ring);
   }
+
+  /* Tailwind v4 Preflight drops the pointer cursor on buttons; restore it for
+     interactive elements (disabled controls keep their not-allowed cursor). */
+  button:not(:disabled),
+  [role='button']:not(:disabled),
+  a[href],
+  label[for],
+  summary,
+  select:not(:disabled) {
+    cursor: pointer;
+  }
 }
 
 @layer utilities {

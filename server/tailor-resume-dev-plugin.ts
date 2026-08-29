@@ -9,6 +9,7 @@ interface IRequestBody {
   jobTitle?: string;
   company?: string;
   focusFindings?: string[];
+  mode?: 'job' | 'ats';
 }
 
 const readBody = async (req: IncomingMessage): Promise<string> => {
@@ -46,9 +47,9 @@ export const tailorResumeDevPlugin = (): Plugin => {
           res.end('Invalid JSON body');
           return;
         }
-        if (!body.resumeJson || !body.jobDescription) {
+        if (!body.resumeJson || (!body.jobDescription && body.mode !== 'ats')) {
           res.statusCode = 400;
-          res.end('Request must include resumeJson and jobDescription');
+          res.end('Request must include resumeJson and a job description');
           return;
         }
 
@@ -63,6 +64,7 @@ export const tailorResumeDevPlugin = (): Plugin => {
             jobTitle: body.jobTitle,
             company: body.company,
             focusFindings: body.focusFindings,
+            mode: body.mode,
           })) {
             (res as ServerResponse).write(`${line}\n`);
           }

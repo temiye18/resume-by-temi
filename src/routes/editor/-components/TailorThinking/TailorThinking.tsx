@@ -6,6 +6,9 @@ import { tailorThinkingSteps, tailorReasoningLines } from '@/constants';
 interface ITailorThinkingProps {
   variant: 'full' | 'strip';
   onStop: () => void;
+  label?: string;
+  steps?: string[];
+  lines?: string[];
 }
 
 const ACCENT_GLOW: CSSProperties = {
@@ -73,11 +76,11 @@ interface IRenderedLine {
   chars: number;
 }
 
-const ReasoningTerminal: FC = () => {
+const ReasoningTerminal: FC<{ source: string[] }> = ({ source }) => {
   const reduced = useReducedMotion() ?? false;
   const [lines, setLines] = useState<IRenderedLine[]>(
     reduced
-      ? tailorReasoningLines.slice(0, VISIBLE_LINES).map((text, i) => ({ text, key: i, chars: text.length }))
+      ? source.slice(0, VISIBLE_LINES).map((text, i) => ({ text, key: i, chars: text.length }))
       : [],
   );
   const idx = useRef(0);
@@ -95,7 +98,7 @@ const ReasoningTerminal: FC = () => {
 
     const advance = () => {
       if (cancelled) return;
-      const text = tailorReasoningLines[idx.current % tailorReasoningLines.length];
+      const text = source[idx.current % source.length];
       const key = keySeq.current++;
       setLines((prev) => [...prev, { text, key, chars: 0 }].slice(-VISIBLE_LINES));
       type(key, text, 0);
@@ -107,7 +110,7 @@ const ReasoningTerminal: FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [reduced]);
+  }, [reduced, source]);
 
   return (
     <div
@@ -152,19 +155,25 @@ const CornerBrackets: FC = () => (
   </>
 );
 
-const useThinkingClock = (): { elapsed: number; step: number } => {
+const useThinkingClock = (stepCount: number): { elapsed: number; step: number } => {
   const [elapsed, setElapsed] = useState(0);
   useEffect(() => {
     const started = performance.now();
     const id = window.setInterval(() => setElapsed(performance.now() - started), 100);
     return () => window.clearInterval(id);
   }, []);
-  const step = Math.min(tailorThinkingSteps.length - 1, Math.floor(elapsed / 1700));
+  const step = Math.min(stepCount - 1, Math.floor(elapsed / 1700));
   return { elapsed, step };
 };
 
-const TailorThinking: FC<ITailorThinkingProps> = ({ variant, onStop }) => {
-  const { elapsed, step } = useThinkingClock();
+const TailorThinking: FC<ITailorThinkingProps> = ({
+  variant,
+  onStop,
+  label = 'Tailoring agent',
+  steps = tailorThinkingSteps,
+  lines = tailorReasoningLines,
+}) => {
+  const { elapsed, step } = useThinkingClock(steps.length);
   const seconds = (elapsed / 1000).toFixed(1);
 
   if (variant === 'strip') {
@@ -172,7 +181,7 @@ const TailorThinking: FC<ITailorThinkingProps> = ({ variant, onStop }) => {
       <div className="flex items-center gap-3 rounded-md border border-accent/30 bg-surface-sunk/40 px-3 py-2.5">
         <Reticle size={22} />
         <span className="flex-1 truncate font-mono text-2xs uppercase tracking-[0.14em] text-ink-soft">
-          {tailorThinkingSteps[step]}
+          {steps[step]}
           <span aria-hidden className="ml-[3px] inline-block h-[0.85em] w-[5px] translate-y-[0.1em] animate-cursor-blink bg-accent align-baseline" />
         </span>
         <button
@@ -193,7 +202,7 @@ const TailorThinking: FC<ITailorThinkingProps> = ({ variant, onStop }) => {
       <div className="flex items-center justify-between">
         <p className="flex items-center gap-2 font-mono text-2xs uppercase tracking-[0.2em] text-muted">
           <span aria-hidden className="inline-block h-1.5 w-1.5 rounded-pill bg-accent" style={ACCENT_GLOW} />
-          Tailoring agent
+          {label}
         </p>
         <span className="font-mono text-2xs tabular-nums text-muted">T+{seconds}s</span>
       </div>
@@ -202,13 +211,13 @@ const TailorThinking: FC<ITailorThinkingProps> = ({ variant, onStop }) => {
         <Reticle size={72} />
         <div className="flex min-w-0 flex-1 flex-col gap-2">
           <p className="font-sans text-sm font-medium text-ink text-pretty">
-            {tailorThinkingSteps[step]}
+            {steps[step]}
             <span aria-hidden className="ml-[3px] inline-block h-[0.9em] w-[6px] translate-y-[0.12em] animate-cursor-blink bg-accent align-baseline" />
           </p>
           <div className="flex items-center gap-1">
-            {tailorThinkingSteps.map((label, i) => (
+            {steps.map((stepLabel, i) => (
               <span
-                key={label}
+                key={stepLabel}
                 className={cn(
                   'h-[3px] flex-1 rounded-pill transition-colors duration-base ease-out-quart',
                   i < step && 'bg-accent/60',
@@ -219,13 +228,13 @@ const TailorThinking: FC<ITailorThinkingProps> = ({ variant, onStop }) => {
             ))}
           </div>
           <span className="font-mono text-2xs uppercase tracking-[0.16em] text-muted tabular-nums">
-            step {String(step + 1).padStart(2, '0')}/{String(tailorThinkingSteps.length).padStart(2, '0')}
+            step {String(step + 1).padStart(2, '0')}/{String(steps.length).padStart(2, '0')}
           </span>
         </div>
       </div>
 
       <div className="mt-4">
-        <ReasoningTerminal />
+        <ReasoningTerminal source={lines} />
       </div>
 
       <div className="mt-3 flex items-center justify-end font-mono text-2xs text-muted">

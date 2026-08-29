@@ -1,21 +1,26 @@
 import type { Resume } from '@/schema/resume';
 import type { TailorStatus } from '@/types/tailor-status-type';
 import type { TailorDecision } from '@/types/tailor-decision-type';
+import type { TailorMode } from '@/types/tailor-mode-type';
 import type { IJobMatch } from '@/interfaces/i-job-match';
 import type { ITailorSuggestion } from '@/interfaces/i-tailor-suggestion';
 
 export interface ITailorState {
+  mode: TailorMode;
   status: TailorStatus;
   jobDescription: string;
   jobTitle: string;
   company: string;
   match: IJobMatch | null;
+  atsScore: number | null;
+  atsFindings: string[];
   suggestions: ITailorSuggestion[];
   decisions: Record<string, TailorDecision>;
   error: string | null;
   setJobDescription: (value: string) => void;
   setJobTitle: (value: string) => void;
   setCompany: (value: string) => void;
+  openForAts: (score: number, findings: string[]) => void;
   analyze: (resume: Resume) => void;
   start: (resume: Resume, focusFindings?: string[]) => Promise<void>;
   stop: () => void;

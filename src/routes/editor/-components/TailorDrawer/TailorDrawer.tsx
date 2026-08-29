@@ -2,12 +2,15 @@ import { type FC, type ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { m, AnimatePresence, useReducedMotion } from 'motion/react';
 import { produce } from 'immer';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { Cancel01Icon, AnalyticsUpIcon, CheckmarkCircle02Icon } from '@hugeicons/core-free-icons';
+import { Cancel01Icon, AiMagicIcon, CheckmarkCircle02Icon } from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/cn';
 import { useResumeStore } from '@/store/resumeStore';
 import { useTailorStore } from '@/store/tailorStore';
 import { analyzeJobMatch, tailorMutator } from '@/helpers';
+import { atsThinkingSteps, atsReasoningLines } from '@/constants';
 import { getResume, saveTailoredVersion } from '@/db/repository';
+import { generatePdf } from '@/pdf/generatePdf';
+import { atsCheck } from '@/pdf/atsCheck';
 import JobMatchMeter from '../JobMatchMeter/JobMatchMeter';
 import TailorSuggestionCard from '../TailorSuggestionCard/TailorSuggestionCard';
 import TailorThinking from '../TailorThinking/TailorThinking';
@@ -25,7 +28,13 @@ const TailorDrawer: FC<ITailorDrawerProps> = ({ open, onClose, resumeId }) => {
   const baseResume = useResumeStore((s) => s.resume);
   const setResume = useResumeStore((s) => s.setResume);
   const name = useResumeStore((s) => s.name);
+  const templateId = useResumeStore((s) => s.templateId);
+  const theme = useResumeStore((s) => s.theme);
 
+  const mode = useTailorStore((s) => s.mode);
+  const atsScore = useTailorStore((s) => s.atsScore);
+  const atsFindings = useTailorStore((s) => s.atsFindings);
+  const openForAts = useTailorStore((s) => s.openForAts);
   const status = useTailorStore((s) => s.status);
   const jobDescription = useTailorStore((s) => s.jobDescription);
   const jobTitle = useTailorStore((s) => s.jobTitle);
@@ -45,7 +54,12 @@ const TailorDrawer: FC<ITailorDrawerProps> = ({ open, onClose, resumeId }) => {
 
   const reduceMotion = useReducedMotion();
   const [flash, setFlash] = useState<string | null>(null);
+  const [rechecking, setRechecking] = useState(false);
 
+  const isAts = mode === 'ats';
+  const thinkingProps = isAts
+    ? { label: 'ATS agent', steps: atsThinkingSteps, lines: atsReasoningLines }
+    : {};
   const jd = jobDescription.trim();
   const jdReady = jd.length >= MIN_JD;
   const streaming = status === 'streaming';
@@ -89,7 +103,27 @@ const TailorDrawer: FC<ITailorDrawerProps> = ({ open, onClose, resumeId }) => {
 
   const handleEnhance = () => {
     setFlash(null);
-    void start(baseResume, focusFindings);
+    void start(baseResume, isAts ? undefined : focusFindings);
+  };
+
+  const handleApplyAndRecheck = async () => {
+    const applied = workingResume;
+    setResume(applied);
+    setFlash(null);
+    setRechecking(true);
+    try {
+      const blob = await generatePdf({ resume: applied, templateId, theme });
+      const result = await atsCheck(blob, applied);
+      openForAts(
+        result.score,
+        result.findings.map((f) => `${f.rule} — ${f.message}`),
+      );
+      setFlash(`Applied. ATS score is now ${result.score}.`);
+    } catch {
+      setFlash('Applied. Re-run the ATS check from the Export tab to see the new score.');
+    } finally {
+      setRechecking(false);
+    }
   };
 
   const handleApply = () => {
@@ -113,6 +147,15 @@ const TailorDrawer: FC<ITailorDrawerProps> = ({ open, onClose, resumeId }) => {
     );
     reset();
     setFlash(`Saved “${versionName}”. Find it on your dashboard.`);
+  };
+
+  const handleStartOver = () => {
+    setFlash(null);
+    if (isAts && atsScore != null) {
+      openForAts(atsScore, atsFindings);
+    } else {
+      reset();
+    }
   };
 
   const summary = liveMatch
@@ -149,9 +192,13 @@ const TailorDrawer: FC<ITailorDrawerProps> = ({ open, onClose, resumeId }) => {
           >
             <header className="flex items-start justify-between gap-3 border-b border-border px-5 py-4">
               <div className="flex flex-col gap-0.5">
-                <h2 className="font-display text-lg font-medium text-ink">Tailor to a job</h2>
+                <h2 className="font-display text-lg font-medium text-ink">
+                  {isAts ? 'Improve for ATS' : 'Tailor to a job'}
+                </h2>
                 <p className="font-sans text-xs text-muted">
-                  Rewrites grounded in your résumé — nothing invented.
+                  {isAts
+                    ? 'Fixes for the flagged issues — grounded in your résumé.'
+                    : 'Rewrites grounded in your résumé — nothing invented.'}
                 </p>
               </div>
               <button
@@ -166,63 +213,97 @@ const TailorDrawer: FC<ITailorDrawerProps> = ({ open, onClose, resumeId }) => {
 
             <div className="flex-1 min-h-0 overflow-y-auto scrollbar-slim">
               <div className="flex flex-col gap-5 px-5 py-5">
-                <div className="flex flex-col gap-2.5">
-                  <div className="grid grid-cols-2 gap-2">
-                    <input
-                      value={jobTitle}
-                      onChange={(e: ChangeEvent<HTMLInputElement>) => setJobTitle(e.target.value)}
-                      placeholder="Job title"
-                      className="h-9 rounded-sm border border-border bg-bg px-2.5 font-sans text-sm text-ink placeholder:text-muted transition-colors duration-fast ease-out-quart focus:border-accent focus:outline-none"
-                    />
-                    <input
-                      value={company}
-                      onChange={(e: ChangeEvent<HTMLInputElement>) => setCompany(e.target.value)}
-                      placeholder="Company"
-                      className="h-9 rounded-sm border border-border bg-bg px-2.5 font-sans text-sm text-ink placeholder:text-muted transition-colors duration-fast ease-out-quart focus:border-accent focus:outline-none"
-                    />
+                {isAts ? (
+                  <div className="flex items-center gap-4 rounded-md border border-border bg-surface-sunk/40 p-4">
+                    <div className="flex flex-col items-center">
+                      <span
+                        className={cn(
+                          'font-display text-3xl font-semibold leading-none tabular-nums',
+                          atsScore == null && 'text-ink',
+                          atsScore != null && atsScore >= 90 && 'text-success',
+                          atsScore != null && atsScore >= 70 && atsScore < 90 && 'text-warning',
+                          atsScore != null && atsScore < 70 && 'text-danger',
+                        )}
+                      >
+                        {atsScore ?? '—'}
+                      </span>
+                      <span className="font-mono text-2xs uppercase tracking-[0.16em] text-muted">
+                        score
+                      </span>
+                    </div>
+                    <p className="flex-1 font-sans text-sm text-ink-soft text-pretty">
+                      {atsFindings.length > 0
+                        ? `${atsFindings.length} issue${atsFindings.length === 1 ? '' : 's'} flagged. AI will fix the content ones; apply and re-check to see the score move.`
+                        : 'Let AI tighten your résumé, then apply and re-check.'}
+                    </p>
                   </div>
-                  <textarea
-                    autoFocus
-                    value={jobDescription}
-                    onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setJobDescription(e.target.value)}
-                    placeholder="Paste the job description."
-                    rows={5}
-                    className="resize-none rounded-sm border border-border bg-bg px-2.5 py-2 font-sans text-sm text-ink placeholder:text-muted transition-colors duration-fast ease-out-quart focus:border-accent focus:outline-none scrollbar-slim"
-                  />
-                </div>
+                ) : (
+                  <>
+                    <div className="flex flex-col gap-2.5">
+                      <div className="grid grid-cols-2 gap-2">
+                        <input
+                          value={jobTitle}
+                          onChange={(e: ChangeEvent<HTMLInputElement>) => setJobTitle(e.target.value)}
+                          placeholder="Job title"
+                          className="h-9 rounded-sm border border-border bg-bg px-2.5 font-sans text-sm text-ink placeholder:text-muted transition-colors duration-fast ease-out-quart focus:border-accent focus:outline-none"
+                        />
+                        <input
+                          value={company}
+                          onChange={(e: ChangeEvent<HTMLInputElement>) => setCompany(e.target.value)}
+                          placeholder="Company"
+                          className="h-9 rounded-sm border border-border bg-bg px-2.5 font-sans text-sm text-ink placeholder:text-muted transition-colors duration-fast ease-out-quart focus:border-accent focus:outline-none"
+                        />
+                      </div>
+                      <textarea
+                        autoFocus
+                        value={jobDescription}
+                        onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setJobDescription(e.target.value)}
+                        placeholder="Paste the job description."
+                        rows={5}
+                        className="resize-none rounded-sm border border-border bg-bg px-2.5 py-2 font-sans text-sm text-ink placeholder:text-muted transition-colors duration-fast ease-out-quart focus:border-accent focus:outline-none scrollbar-slim"
+                      />
+                    </div>
 
-                {jdReady ? (
-                  <div className="flex flex-col gap-3 rounded-md border border-border bg-surface-sunk/40 p-4">
-                    <JobMatchMeter value={meterValue} caption={summary} delta={delta} />
-                    {liveMatch && liveMatch.missingSkills.length > 0 ? (
-                      <div className="flex flex-wrap gap-1.5">
-                        {liveMatch.missingSkills.slice(0, 10).map((skill) => (
-                          <span
-                            key={skill}
-                            className="inline-flex items-center rounded-xs border border-border bg-bg px-1.5 py-0.5 font-mono text-2xs text-ink-soft"
-                          >
-                            {skill}
-                          </span>
-                        ))}
+                    {jdReady ? (
+                      <div className="flex flex-col gap-3 rounded-md border border-border bg-surface-sunk/40 p-4">
+                        <JobMatchMeter value={meterValue} caption={summary} delta={delta} />
+                        {liveMatch && liveMatch.missingSkills.length > 0 ? (
+                          <div className="flex flex-wrap gap-1.5">
+                            {liveMatch.missingSkills.slice(0, 10).map((skill) => (
+                              <span
+                                key={skill}
+                                className="inline-flex items-center rounded-xs border border-border bg-bg px-1.5 py-0.5 font-mono text-2xs text-ink-soft"
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        ) : null}
                       </div>
                     ) : null}
-                  </div>
-                ) : null}
+                  </>
+                )}
 
                 {!streaming ? (
                   <button
                     type="button"
                     onClick={handleEnhance}
-                    disabled={!jdReady}
+                    disabled={!isAts && !jdReady}
                     className={cn(
                       'inline-flex h-10 items-center justify-center gap-2 rounded-sm font-sans text-sm font-medium transition-[background-color,transform] duration-fast ease-out-quart focus-visible:outline-none',
-                      jdReady
+                      isAts || jdReady
                         ? 'bg-ink text-bg hover:bg-accent active:translate-y-px'
                         : 'cursor-not-allowed bg-surface text-muted',
                     )}
                   >
-                    <HugeiconsIcon icon={AnalyticsUpIcon} size={16} strokeWidth={1.5} />
-                    {suggestions.length > 0 ? 'Enhance again' : 'Enhance with AI'}
+                    <HugeiconsIcon icon={AiMagicIcon} size={16} strokeWidth={1.5} />
+                    {isAts
+                      ? suggestions.length > 0
+                        ? 'Find more fixes'
+                        : 'Fix with AI'
+                      : suggestions.length > 0
+                        ? 'Enhance again'
+                        : 'Enhance with AI'}
                   </button>
                 ) : null}
 
@@ -233,7 +314,7 @@ const TailorDrawer: FC<ITailorDrawerProps> = ({ open, onClose, resumeId }) => {
                 ) : null}
 
                 {streaming && suggestions.length === 0 ? (
-                  <TailorThinking variant="full" onStop={stop} />
+                  <TailorThinking variant="full" onStop={stop} {...thinkingProps} />
                 ) : null}
 
                 {suggestions.length > 0 ? (
@@ -271,12 +352,13 @@ const TailorDrawer: FC<ITailorDrawerProps> = ({ open, onClose, resumeId }) => {
                         onDecide={(d) => decide(s.id, d)}
                       />
                     ))}
-                    {streaming ? <TailorThinking variant="strip" onStop={stop} /> : null}
+                    {streaming ? <TailorThinking variant="strip" onStop={stop} {...thinkingProps} /> : null}
                   </div>
-                ) : !streaming && jdReady && status !== 'error' ? (
+                ) : !streaming && (isAts || jdReady) && status !== 'error' ? (
                   <p className="font-sans text-sm text-muted text-pretty">
-                    Enhance to see line-by-line rewrites that close each gap. You accept or skip
-                    every one — nothing changes until you do.
+                    {isAts
+                      ? 'Run the AI fix to see line-by-line rewrites that close each flagged issue — you accept or skip every one, and nothing changes until you do.'
+                      : 'Enhance to see line-by-line rewrites that close each gap. You accept or skip every one — nothing changes until you do.'}
                   </p>
                 ) : null}
               </div>
@@ -290,32 +372,50 @@ const TailorDrawer: FC<ITailorDrawerProps> = ({ open, onClose, resumeId }) => {
                 </p>
               ) : null}
               <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={handleApply}
-                  disabled={accepted.length === 0}
-                  className={cn(
-                    'inline-flex h-10 flex-1 items-center justify-center rounded-sm font-sans text-sm font-medium transition-colors duration-fast ease-out-quart focus-visible:outline-none',
-                    accepted.length > 0
-                      ? 'bg-ink text-bg hover:bg-accent'
-                      : 'cursor-not-allowed bg-surface text-muted',
-                  )}
-                >
-                  Apply to this résumé
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void handleSaveVersion()}
-                  disabled={accepted.length === 0}
-                  className={cn(
-                    'inline-flex h-10 flex-1 items-center justify-center rounded-sm border font-sans text-sm font-medium transition-colors duration-fast ease-out-quart focus-visible:outline-none',
-                    accepted.length > 0
-                      ? 'border-border bg-bg text-ink hover:border-border-strong'
-                      : 'cursor-not-allowed border-border bg-surface text-muted',
-                  )}
-                >
-                  Save as version
-                </button>
+                {isAts ? (
+                  <button
+                    type="button"
+                    onClick={() => void handleApplyAndRecheck()}
+                    disabled={accepted.length === 0 || rechecking}
+                    className={cn(
+                      'inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-sm font-sans text-sm font-medium transition-colors duration-fast ease-out-quart focus-visible:outline-none',
+                      accepted.length > 0 && !rechecking
+                        ? 'bg-ink text-bg hover:bg-accent'
+                        : 'cursor-not-allowed bg-surface text-muted',
+                    )}
+                  >
+                    {rechecking ? 'Re-checking ATS…' : 'Apply & re-check ATS'}
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleApply}
+                      disabled={accepted.length === 0}
+                      className={cn(
+                        'inline-flex h-10 flex-1 items-center justify-center rounded-sm font-sans text-sm font-medium transition-colors duration-fast ease-out-quart focus-visible:outline-none',
+                        accepted.length > 0
+                          ? 'bg-ink text-bg hover:bg-accent'
+                          : 'cursor-not-allowed bg-surface text-muted',
+                      )}
+                    >
+                      Apply to this résumé
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void handleSaveVersion()}
+                      disabled={accepted.length === 0}
+                      className={cn(
+                        'inline-flex h-10 flex-1 items-center justify-center rounded-sm border font-sans text-sm font-medium transition-colors duration-fast ease-out-quart focus-visible:outline-none',
+                        accepted.length > 0
+                          ? 'border-border bg-bg text-ink hover:border-border-strong'
+                          : 'cursor-not-allowed border-border bg-surface text-muted',
+                      )}
+                    >
+                      Save as version
+                    </button>
+                  </>
+                )}
               </div>
               <div className="mt-2 flex items-center justify-between">
                 <span className="font-mono text-2xs uppercase tracking-[0.16em] text-muted">
@@ -324,7 +424,7 @@ const TailorDrawer: FC<ITailorDrawerProps> = ({ open, onClose, resumeId }) => {
                 {suggestions.length > 0 ? (
                   <button
                     type="button"
-                    onClick={reset}
+                    onClick={handleStartOver}
                     className="font-mono text-2xs uppercase tracking-[0.16em] text-muted underline decoration-1 underline-offset-2 transition-colors duration-fast ease-out-quart hover:text-ink"
                   >
                     Start over

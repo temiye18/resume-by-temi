@@ -14,6 +14,7 @@ interface ITailorBody {
   jobTitle?: string;
   company?: string;
   focusFindings?: string[];
+  mode?: 'job' | 'ats';
 }
 
 interface IRefineBody {
@@ -100,10 +101,10 @@ const handleTailorResume = async (request: Request, env: Env): Promise<Response>
   } catch {
     return new Response('Invalid JSON body', { status: 400 });
   }
-  if (!body.resumeJson || !body.jobDescription) {
-    return new Response('Request must include resumeJson and jobDescription', { status: 400 });
+  if (!body.resumeJson || (!body.jobDescription && body.mode !== 'ats')) {
+    return new Response('Request must include resumeJson and a job description', { status: 400 });
   }
-  if (body.resumeJson.length + body.jobDescription.length > 200_000) {
+  if (body.resumeJson.length + (body.jobDescription?.length ?? 0) > 200_000) {
     return new Response('Resume and job description are too large', { status: 413 });
   }
 
@@ -114,10 +115,11 @@ const handleTailorResume = async (request: Request, env: Env): Promise<Response>
         for await (const line of streamTailorLines({
           apiKey: env.GEMINI_API_KEY,
           resumeJson: body.resumeJson!,
-          jobDescription: body.jobDescription!,
+          jobDescription: body.jobDescription,
           jobTitle: body.jobTitle,
           company: body.company,
           focusFindings: body.focusFindings,
+          mode: body.mode,
         })) {
           controller.enqueue(encoder.encode(`${line}\n`));
         }

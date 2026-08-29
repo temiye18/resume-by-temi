@@ -22,6 +22,7 @@ interface IRequestBody {
   jobTitle?: string;
   company?: string;
   focusFindings?: string[];
+  mode?: 'job' | 'ats';
 }
 
 const normalizeOrigin = (raw: string): string =>
@@ -63,11 +64,11 @@ export default async function handler(
   }
 
   const body = req.body as IRequestBody | undefined;
-  if (!body?.resumeJson || !body?.jobDescription) {
-    res.status(400).send('Request must include resumeJson and jobDescription');
+  if (!body?.resumeJson || (!body?.jobDescription && body?.mode !== 'ats')) {
+    res.status(400).send('Request must include resumeJson and a job description');
     return;
   }
-  if (body.resumeJson.length + body.jobDescription.length > 200_000) {
+  if (body.resumeJson.length + (body.jobDescription?.length ?? 0) > 200_000) {
     res.status(413).send('Resume and job description are too large');
     return;
   }
@@ -84,6 +85,7 @@ export default async function handler(
       jobTitle: body.jobTitle,
       company: body.company,
       focusFindings: body.focusFindings,
+      mode: body.mode,
     })) {
       res.write(`${line}\n`);
     }

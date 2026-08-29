@@ -5,10 +5,11 @@ import type { TailorOp } from '@/types/tailor-op-type';
 
 interface ITailorStreamRequest {
   resume: Resume;
-  jobDescription: string;
+  jobDescription?: string;
   jobTitle?: string;
   company?: string;
   focusFindings?: string[];
+  mode?: 'job' | 'ats';
   signal?: AbortSignal;
 }
 
@@ -103,6 +104,7 @@ export async function* streamTailorSuggestions(
       jobTitle: req.jobTitle,
       company: req.company,
       focusFindings: req.focusFindings,
+      mode: req.mode,
     }),
   });
 
