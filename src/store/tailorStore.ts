@@ -76,6 +76,15 @@ export const useTailorStore = create<ITailorState>((set, get) => ({
   decide: (id, decision) =>
     set((state) => ({ decisions: { ...state.decisions, [id]: decision } })),
 
+  decideAllPending: (decision) =>
+    set((state) => {
+      const next = { ...state.decisions };
+      for (const s of state.suggestions) {
+        if ((next[s.id] ?? 'pending') === 'pending') next[s.id] = decision;
+      }
+      return { decisions: next };
+    }),
+
   reset: () => {
     controller?.abort();
     controller = null;

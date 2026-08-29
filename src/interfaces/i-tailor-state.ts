@@ -20,5 +20,6 @@ export interface ITailorState {
   start: (resume: Resume, focusFindings?: string[]) => Promise<void>;
   stop: () => void;
   decide: (id: string, decision: TailorDecision) => void;
+  decideAllPending: (decision: TailorDecision) => void;
   reset: () => void;
 }

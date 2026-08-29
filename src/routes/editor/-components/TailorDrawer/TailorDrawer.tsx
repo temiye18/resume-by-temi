@@ -40,6 +40,7 @@ const TailorDrawer: FC<ITailorDrawerProps> = ({ open, onClose, resumeId }) => {
   const start = useTailorStore((s) => s.start);
   const stop = useTailorStore((s) => s.stop);
   const decide = useTailorStore((s) => s.decide);
+  const decideAllPending = useTailorStore((s) => s.decideAllPending);
   const reset = useTailorStore((s) => s.reset);
 
   const reduceMotion = useReducedMotion();
@@ -53,6 +54,9 @@ const TailorDrawer: FC<ITailorDrawerProps> = ({ open, onClose, resumeId }) => {
     () => suggestions.filter((s) => decisions[s.id] === 'accepted'),
     [suggestions, decisions],
   );
+  const pendingCount = suggestions.filter(
+    (s) => (decisions[s.id] ?? 'pending') === 'pending',
+  ).length;
 
   const workingResume = useMemo(() => {
     if (accepted.length === 0) return baseResume;
@@ -234,6 +238,30 @@ const TailorDrawer: FC<ITailorDrawerProps> = ({ open, onClose, resumeId }) => {
 
                 {suggestions.length > 0 ? (
                   <div className="flex flex-col gap-2.5">
+                    {pendingCount > 1 ? (
+                      <div className="flex items-center justify-between gap-2 rounded-sm border border-border bg-surface-sunk/40 px-3 py-2">
+                        <span className="font-mono text-2xs uppercase tracking-[0.16em] text-muted">
+                          {pendingCount} to review
+                        </span>
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() => decideAllPending('rejected')}
+                            className="font-mono text-2xs uppercase tracking-[0.16em] text-muted underline decoration-1 underline-offset-2 transition-colors duration-fast ease-out-quart hover:text-ink focus-visible:outline-none"
+                          >
+                            Skip all
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => decideAllPending('accepted')}
+                            className="inline-flex h-7 items-center gap-1.5 rounded-sm bg-ink px-2.5 font-sans text-xs font-medium text-bg transition-[background-color] duration-fast ease-out-quart hover:bg-accent focus-visible:outline-none"
+                          >
+                            <HugeiconsIcon icon={CheckmarkCircle02Icon} size={13} strokeWidth={1.75} />
+                            Accept all
+                          </button>
+                        </div>
+                      </div>
+                    ) : null}
                     {suggestions.map((s, i) => (
                       <TailorSuggestionCard
                         key={s.id}
