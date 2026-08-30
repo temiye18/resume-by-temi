@@ -50,11 +50,13 @@ const TailorDrawer: FC<ITailorDrawerProps> = ({ open, onClose, resumeId }) => {
   const stop = useTailorStore((s) => s.stop);
   const decide = useTailorStore((s) => s.decide);
   const decideAllPending = useTailorStore((s) => s.decideAllPending);
+  const editSuggestion = useTailorStore((s) => s.editSuggestion);
   const reset = useTailorStore((s) => s.reset);
 
   const reduceMotion = useReducedMotion();
   const [flash, setFlash] = useState<string | null>(null);
   const [rechecking, setRechecking] = useState(false);
+  const [confirmClose, setConfirmClose] = useState(false);
 
   const isAts = mode === 'ats';
   const thinkingProps = isAts
@@ -88,13 +90,26 @@ const TailorDrawer: FC<ITailorDrawerProps> = ({ open, onClose, resumeId }) => {
   const baseline = snapshot?.coverage ?? meterValue;
   const delta = suggestions.length > 0 ? meterValue - baseline : null;
 
+  const requestClose = () => {
+    if (suggestions.length > 0) setConfirmClose(true);
+    else onClose();
+  };
+
+  const confirmedClose = () => {
+    setConfirmClose(false);
+    onClose();
+  };
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key !== 'Escape') return;
+      if (confirmClose) setConfirmClose(false);
+      else if (suggestions.length > 0) setConfirmClose(true);
+      else onClose();
     };
     if (open) window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
+  }, [open, onClose, confirmClose, suggestions.length]);
 
   const focusFindings =
     liveMatch && liveMatch.missingSkills.length > 0
@@ -176,7 +191,7 @@ const TailorDrawer: FC<ITailorDrawerProps> = ({ open, onClose, resumeId }) => {
         >
           <button
             type="button"
-            onClick={onClose}
+            onClick={requestClose}
             aria-label="Close"
             className="absolute inset-0 bg-bg/70 backdrop-blur-[2px]"
           />
@@ -203,7 +218,7 @@ const TailorDrawer: FC<ITailorDrawerProps> = ({ open, onClose, resumeId }) => {
               </div>
               <button
                 type="button"
-                onClick={onClose}
+                onClick={requestClose}
                 aria-label="Close"
                 className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-sm text-muted transition-colors duration-fast ease-out-quart hover:bg-surface hover:text-ink focus-visible:outline-none"
               >
@@ -350,6 +365,7 @@ const TailorDrawer: FC<ITailorDrawerProps> = ({ open, onClose, resumeId }) => {
                         decision={decisions[s.id] ?? 'pending'}
                         animate={i === suggestions.length - 1 && streaming}
                         onDecide={(d) => decide(s.id, d)}
+                        onEdit={(after) => editSuggestion(s.id, after)}
                       />
                     ))}
                     {streaming ? <TailorThinking variant="strip" onStop={stop} {...thinkingProps} /> : null}
@@ -432,6 +448,39 @@ const TailorDrawer: FC<ITailorDrawerProps> = ({ open, onClose, resumeId }) => {
                 ) : null}
               </div>
             </footer>
+
+            {confirmClose ? (
+              <div
+                role="alertdialog"
+                aria-label="Close confirmation"
+                className="absolute inset-0 z-10 flex items-center justify-center bg-bg/70 px-6 backdrop-blur-[2px]"
+              >
+                <div className="flex w-full max-w-[300px] flex-col gap-2.5 rounded-md border border-border bg-bg p-4 shadow-modal">
+                  <p className="font-display text-md font-medium text-ink">Close this panel?</p>
+                  <p className="font-sans text-sm text-ink-soft text-pretty">
+                    Your suggestions are kept — reopen them anytime from the Tailor button in the
+                    top bar.
+                  </p>
+                  <div className="mt-1 flex items-center gap-2">
+                    <button
+                      type="button"
+                      autoFocus
+                      onClick={() => setConfirmClose(false)}
+                      className="inline-flex h-9 flex-1 items-center justify-center rounded-sm bg-ink px-3 font-sans text-sm font-medium text-bg transition-colors duration-fast ease-out-quart hover:bg-accent focus-visible:outline-none"
+                    >
+                      Keep reviewing
+                    </button>
+                    <button
+                      type="button"
+                      onClick={confirmedClose}
+                      className="inline-flex h-9 flex-1 items-center justify-center rounded-sm border border-border bg-bg px-3 font-sans text-sm font-medium text-ink-soft transition-colors duration-fast ease-out-quart hover:border-border-strong hover:text-ink focus-visible:outline-none"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : null}
           </m.aside>
         </m.div>
       ) : null}

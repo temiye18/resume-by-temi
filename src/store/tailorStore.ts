@@ -111,6 +111,13 @@ export const useTailorStore = create<ITailorState>((set, get) => ({
       return { decisions: next };
     }),
 
+  editSuggestion: (id, after) =>
+    set((state) => ({
+      suggestions: state.suggestions.map((s) =>
+        s.id === id ? { ...s, after, placeholder: after.includes('[add') } : s,
+      ),
+    })),
+
   reset: () => {
     controller?.abort();
     controller = null;

@@ -6,6 +6,7 @@ import AutosaveIndicator from '../AutosaveIndicator/AutosaveIndicator';
 import UndoRedo from '../UndoRedo/UndoRedo';
 import ThemeToggle from '@/components/ThemeToggle/ThemeToggle';
 import { useResumeStore } from '@/store/resumeStore';
+import { useTailorStore } from '@/store/tailorStore';
 
 interface IEditorTopBarProps {
   onDownload: () => void;
@@ -20,6 +21,8 @@ const EditorTopBar: FC<IEditorTopBarProps> = ({
 }) => {
   const name = useResumeStore((s) => s.name);
   const setName = useResumeStore((s) => s.setName);
+  const tailorInProgress = useTailorStore((s) => s.suggestions.length > 0);
+  const tailorMode = useTailorStore((s) => s.mode);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(name);
 
@@ -77,10 +80,21 @@ const EditorTopBar: FC<IEditorTopBarProps> = ({
         <button
           type="button"
           onClick={onOpenTailor}
-          className="inline-flex h-9 items-center gap-2 rounded-sm border border-border bg-bg px-2.5 sm:px-3 text-sm font-medium text-ink-soft transition-colors duration-fast ease-out-quart hover:border-border-strong hover:text-ink focus-visible:outline-none"
+          title={
+            tailorInProgress
+              ? `Resume your ${tailorMode === 'ats' ? 'ATS improvement' : 'tailoring'} session`
+              : 'Tailor to a job'
+          }
+          className="relative inline-flex h-9 items-center gap-2 rounded-sm border border-border bg-bg px-2.5 sm:px-3 text-sm font-medium text-ink-soft transition-colors duration-fast ease-out-quart hover:border-border-strong hover:text-ink focus-visible:outline-none"
         >
           <HugeiconsIcon icon={AnalyticsUpIcon} size={16} strokeWidth={1.5} />
           <span className="hidden sm:inline">Tailor</span>
+          {tailorInProgress ? (
+            <span
+              aria-hidden
+              className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-pill border border-bg bg-accent"
+            />
+          ) : null}
         </button>
         <button
           type="button"

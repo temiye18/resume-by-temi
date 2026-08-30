@@ -1,5 +1,5 @@
-export const PRIMARY_MODEL = 'gemini-2.5-flash';
-export const FALLBACK_MODEL = 'gemini-2.5-flash-lite';
+export const PRIMARY_MODEL = 'gemini-3.7-flash';
+export const FALLBACK_MODEL = 'gemini-3.5-flash-lite';
 
 export type GeminiRefineModel = typeof PRIMARY_MODEL | typeof FALLBACK_MODEL;
 export type RefineKind = 'bullet' | 'summary' | 'description';

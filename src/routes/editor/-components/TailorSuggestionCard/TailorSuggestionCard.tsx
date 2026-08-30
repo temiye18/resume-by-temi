@@ -1,4 +1,4 @@
-import { type FC } from 'react';
+import { type FC, type ChangeEvent, useState } from 'react';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { CheckmarkCircle02Icon, Cancel01Icon } from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/cn';
@@ -11,6 +11,7 @@ interface ITailorSuggestionCardProps {
   decision: TailorDecision;
   animate: boolean;
   onDecide: (decision: TailorDecision) => void;
+  onEdit: (after: string) => void;
 }
 
 const opLabel = (s: ITailorSuggestion): string => {
@@ -33,12 +34,25 @@ const TailorSuggestionCard: FC<ITailorSuggestionCardProps> = ({
   decision,
   animate,
   onDecide,
+  onEdit,
 }) => {
-  const shown = useTypewriter(suggestion.after, animate && decision === 'pending');
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(suggestion.after);
+  const shown = useTypewriter(suggestion.after, animate && decision === 'pending' && !editing);
   const accepted = decision === 'accepted';
   const rejected = decision === 'rejected';
+  const canEdit = suggestion.op !== 'add-skill';
   const displayAfter =
     suggestion.op === 'add-skill' && suggestion.skill ? suggestion.skill : shown;
+
+  const startEdit = () => {
+    setDraft(suggestion.after);
+    setEditing(true);
+  };
+  const saveEdit = () => {
+    onEdit(draft.trim() || suggestion.after);
+    setEditing(false);
+  };
 
   return (
     <div
@@ -71,37 +85,76 @@ const TailorSuggestionCard: FC<ITailorSuggestionCardProps> = ({
         </p>
       ) : null}
 
-      <p
-        className={cn(
-          'font-sans text-sm leading-snug text-pretty',
-          rejected ? 'text-muted' : 'text-accent-ink dark:text-accent',
-        )}
-      >
-        {displayAfter}
-      </p>
+      {editing ? (
+        <textarea
+          autoFocus
+          value={draft}
+          onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setDraft(e.target.value)}
+          rows={4}
+          className="w-full resize-none rounded-xs border border-accent/50 bg-bg px-2 py-1.5 font-sans text-sm leading-snug text-ink focus:border-accent focus:outline-none scrollbar-slim"
+        />
+      ) : (
+        <p
+          className={cn(
+            'whitespace-pre-wrap font-sans text-sm leading-snug text-pretty',
+            rejected ? 'text-muted' : 'text-accent-ink dark:text-accent',
+          )}
+        >
+          {displayAfter}
+        </p>
+      )}
 
       {suggestion.reason ? (
         <p className="font-mono text-2xs leading-normal text-muted">↳ {suggestion.reason}</p>
       ) : null}
 
       {decision === 'pending' ? (
-        <div className="mt-0.5 flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => onDecide('accepted')}
-            className="inline-flex h-8 flex-1 items-center justify-center gap-1.5 rounded-sm bg-ink px-3 font-sans text-xs font-medium text-bg transition-[background-color,transform] duration-fast ease-out-quart hover:bg-accent active:translate-y-px focus-visible:outline-none"
-          >
-            <HugeiconsIcon icon={CheckmarkCircle02Icon} size={14} strokeWidth={1.75} />
-            {suggestion.confirm ? 'Yes, I have it' : 'Accept'}
-          </button>
-          <button
-            type="button"
-            onClick={() => onDecide('rejected')}
-            className="inline-flex h-8 items-center justify-center gap-1.5 rounded-sm border border-border bg-bg px-3 font-sans text-xs font-medium text-ink-soft transition-colors duration-fast ease-out-quart hover:border-border-strong hover:text-ink focus-visible:outline-none"
-          >
-            Skip
-          </button>
-        </div>
+        editing ? (
+          <div className="mt-0.5 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={saveEdit}
+              className="inline-flex h-8 flex-1 items-center justify-center gap-1.5 rounded-sm bg-ink px-3 font-sans text-xs font-medium text-bg transition-[background-color] duration-fast ease-out-quart hover:bg-accent focus-visible:outline-none"
+            >
+              <HugeiconsIcon icon={CheckmarkCircle02Icon} size={14} strokeWidth={1.75} />
+              Save edit
+            </button>
+            <button
+              type="button"
+              onClick={() => setEditing(false)}
+              className="inline-flex h-8 items-center justify-center rounded-sm border border-border bg-bg px-3 font-sans text-xs font-medium text-ink-soft transition-colors duration-fast ease-out-quart hover:border-border-strong hover:text-ink focus-visible:outline-none"
+            >
+              Cancel
+            </button>
+          </div>
+        ) : (
+          <div className="mt-0.5 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => onDecide('accepted')}
+              className="inline-flex h-8 flex-1 items-center justify-center gap-1.5 rounded-sm bg-ink px-3 font-sans text-xs font-medium text-bg transition-[background-color,transform] duration-fast ease-out-quart hover:bg-accent active:translate-y-px focus-visible:outline-none"
+            >
+              <HugeiconsIcon icon={CheckmarkCircle02Icon} size={14} strokeWidth={1.75} />
+              {suggestion.confirm ? 'Yes, I have it' : 'Accept'}
+            </button>
+            <button
+              type="button"
+              onClick={() => onDecide('rejected')}
+              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-sm border border-border bg-bg px-3 font-sans text-xs font-medium text-ink-soft transition-colors duration-fast ease-out-quart hover:border-border-strong hover:text-ink focus-visible:outline-none"
+            >
+              Skip
+            </button>
+            {canEdit ? (
+              <button
+                type="button"
+                onClick={startEdit}
+                className="inline-flex h-8 items-center justify-center rounded-sm border border-border bg-bg px-3 font-sans text-xs font-medium text-ink-soft transition-colors duration-fast ease-out-quart hover:border-border-strong hover:text-ink focus-visible:outline-none"
+              >
+                Edit
+              </button>
+            ) : null}
+          </div>
+        )
       ) : (
         <div className="mt-0.5 flex items-center justify-between">
           <span

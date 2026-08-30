@@ -26,5 +26,6 @@ export interface ITailorState {
   stop: () => void;
   decide: (id: string, decision: TailorDecision) => void;
   decideAllPending: (decision: TailorDecision) => void;
+  editSuggestion: (id: string, after: string) => void;
   reset: () => void;
 }

@@ -1,5 +1,5 @@
-export const PRIMARY_MODEL = 'gemini-2.5-flash';
-export const FALLBACK_MODEL = 'gemini-2.5-flash-lite';
+export const PRIMARY_MODEL = 'gemini-3.7-flash';
+export const FALLBACK_MODEL = 'gemini-3.5-flash-lite';
 
 export type GeminiTailorModel = typeof PRIMARY_MODEL | typeof FALLBACK_MODEL;
 
@@ -12,6 +12,8 @@ ABSOLUTE HONESTY RULES — these are non-negotiable:
 - Only rephrase, strengthen, and re-order facts that are ALREADY present in the resume. You may sharpen weak phrasing ("responsible for" -> a strong action verb), surface a real detail more prominently, and mirror a job-description keyword ONLY when the candidate's own text already supports it.
 - If a bullet would be stronger with a number the resume does not contain, keep it truthful and insert the literal token [add metric] where the candidate should fill one in, and set "placeholder": true.
 - If the job description requires a skill the resume never mentions, DO NOT assume the candidate has it. Emit an "add-skill" suggestion with "confirm": true and a reason that says it is only for them to add if they genuinely have it.
+
+Every edit must be a CLEAR, SUBSTANTIAL rewrite — never echo the original line back with a word swapped. Restructure for impact, lead with a stronger verb, surface the concrete result and scope, and mirror the job-description language the resume already supports. If a line is already strong, SKIP it rather than return a trivial near-duplicate.
 
 OUTPUT FORMAT — NDJSON, and nothing else:
 - Emit ONE JSON object per line. No prose, no markdown, no code fences, no wrapping array.
@@ -36,6 +38,8 @@ ABSOLUTE HONESTY RULES — non-negotiable:
 - If a bullet would be stronger with a number the resume does not contain, keep it truthful and insert the literal token [add metric] where the candidate should fill one in, and set "placeholder": true.
 
 Map each edit to a reported issue — unquantified bullets -> add [add metric]; passive/weak/first-person phrasing -> rewrite active and third person; thin summary -> expand to 2-3 sentences; wordy or too long -> tighten.
+
+Every edit must be a CLEAR, SUBSTANTIAL rewrite — never echo the original line back with a word swapped. Restructure the sentence, lead with a stronger verb, surface the concrete result and scope, and add specificity the resume already supports. If a line is already strong, SKIP it rather than return a trivial near-duplicate. The user should be able to tell at a glance that your version is better.
 
 OUTPUT FORMAT — NDJSON, and nothing else:
 - Emit ONE JSON object per line. No prose, no markdown, no code fences, no wrapping array.
@@ -69,7 +73,7 @@ const buildRequestBody = (args: ITailorArgs): unknown => {
     return {
       systemInstruction: { parts: [{ text: ATS_SYSTEM_INSTRUCTION }] },
       contents: [{ role: 'user', parts: [{ text: userText }] }],
-      generationConfig: { temperature: 0.35, responseMimeType: 'text/plain' },
+      generationConfig: { temperature: 0.6, responseMimeType: 'text/plain' },
     };
   }
 
@@ -82,7 +86,7 @@ const buildRequestBody = (args: ITailorArgs): unknown => {
   return {
     systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
     contents: [{ role: 'user', parts: [{ text: userText }] }],
-    generationConfig: { temperature: 0.35, responseMimeType: 'text/plain' },
+    generationConfig: { temperature: 0.6, responseMimeType: 'text/plain' },
   };
 };
 

@@ -18,7 +18,7 @@ A free, no-account, privacy-first web app for building **100% ATS-friendly** ré
 | **Vector PDF export** | `@react-pdf/renderer` — real text in the content stream with ToUnicode CMaps, embedded fonts, single-column layout. Never image-based, never `html2canvas`. Each exported PDF also embeds an editable source copy, so re-importing it on the dashboard restores your template, fonts, and settings instantly — no re-parse. |
 | **DOCX export** | Plain Calibri 11pt for places that prefer Word; ATS-safe by default. |
 | **JSON Resume export / import** | Full round-trip with the JSON Resume schema. Files exported here carry a namespaced `meta.resumeBuilder` block (template + fonts + theme), so re-importing restores the exact formatting, not just the content — while staying valid JSON Resume for other tools. |
-| **Smart parse** | Drop your old PDF / DOCX résumé on the dashboard, Gemini 2.5 Flash reads the layout and prefills the editor. Local heuristic parser stays available for files you'd rather keep on-device. |
+| **Smart parse** | Drop your old PDF / DOCX résumé on the dashboard, Google's Gemini reads the layout and prefills the editor. Local heuristic parser stays available for files you'd rather keep on-device. |
 | **AI · Tailor to a job** | Paste a job description in the editor; accept/reject rewrites stream in to close the exact ATS gaps, the match score climbs as you accept, then apply them or save a separate tailored version. Grounded in your résumé — never fabricated. |
 | **AI · Refine any field** | Under every summary, bullet, and description, a Refine control streams two sharper, ATS-friendly rewrites to choose from. |
 | **24-rule ATS check** | Numeric score (0–100), per-rule findings, optional job-description keyword matching against a 510-entry skill taxonomy. Catches what Affinda / Jobscan / ResumeWorded catch. |
@@ -71,7 +71,7 @@ Six templates, every variant designed to pass the ATS check by construction (sin
 | Editor | Tiptap 2 | Per-field rich text with markdown round-trip |
 | PDF | `@react-pdf/renderer` | Vector PDFs, embedded fonts |
 | DOCX | `docx` (Dolan Miu) | Plain styled, ATS-friendly |
-| Smart parse | Gemini 2.5 Flash → Gemini 2.5 Flash-Lite (fallback) | Routed through a deploy-target-agnostic proxy |
+| AI (parse / tailor / refine) | Google Gemini (flash tier, with a flash-lite fallback) | Model pinned per feature in each `server/gemini-*.ts` core; routed through a deploy-target-agnostic proxy |
 | Smooth scroll | Lenis | On marketing surfaces only |
 | Fonts | Fontsource (self-hosted) | 9 catalog fonts for the resume canvas |
 | Schema | Zod | Single source of truth for the `Resume` shape |
@@ -188,7 +188,7 @@ Two render trees, one `Resume` data model. The on-screen preview (`src/component
 
 ## AI features: how the proxy works
 
-Three AI features — **Smart parse** (import), **Tailor to a job**, and per-field **Refine** — send content to Gemini 2.5 Flash through a server-side proxy that holds the API key. Three equivalent host wrappers exist; the project picks one based on where it's running. Each delegates to a shared core per feature (`server/gemini-parse.ts`, `server/gemini-tailor.ts`, `server/gemini-refine.ts`) so behaviour is identical. Endpoints: `POST /api/parse-resume`, `POST /api/tailor-resume` (NDJSON-streamed), `POST /api/refine-text` (streamed). Any new AI endpoint must mirror all three wrappers.
+Three AI features — **Smart parse** (import), **Tailor to a job**, and per-field **Refine** — send content to Google's Gemini API through a server-side proxy that holds the API key. Three equivalent host wrappers exist; the project picks one based on where it's running. Each delegates to a shared core per feature (`server/gemini-parse.ts`, `server/gemini-tailor.ts`, `server/gemini-refine.ts`), which is also where each feature's exact model is pinned, so behaviour is identical across hosts. Endpoints: `POST /api/parse-resume`, `POST /api/tailor-resume` (NDJSON-streamed), `POST /api/refine-text` (streamed). Any new AI endpoint must mirror all three wrappers.
 
 - **Cloudflare Workers + Static Assets** — `server/worker.ts` is the Worker entry declared in `wrangler.toml`. It routes `POST /api/parse-resume`, `/api/tailor-resume`, and `/api/refine-text` to their Gemini helpers and passes every other request through the `ASSETS` binding to the built SPA. Key from the `GEMINI_API_KEY` env binding in the Cloudflare dashboard.
 - **Vercel** — `api/parse-resume.ts`, `api/tailor-resume.ts`, and `api/refine-text.ts` are Vercel serverless functions auto-detected from `api/`. Key from `GEMINI_API_KEY` in the Vercel project's env vars.

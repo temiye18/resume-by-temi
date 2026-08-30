@@ -125,7 +125,10 @@ const EditorShell: FC<IEditorShellProps> = ({ resumeId }) => {
 
   const openTailor = () => {
     const t = useTailorStore.getState();
-    if (t.mode !== 'job') t.reset();
+    // Resume an in-progress session (its suggestions are still under review) — a mistaken
+    // close should be recoverable. Only fall back to a fresh job session when a prior ATS
+    // session has already been cleared out.
+    if (t.mode === 'ats' && t.suggestions.length === 0) t.reset();
     setTailorOpen(true);
   };
 
