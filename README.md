@@ -13,7 +13,7 @@ A free, no-account, privacy-first web app for building **100% ATS-friendly** ré
 | Capability | Notes |
 |---|---|
 | **WYSIWYG editor** | Sections / Template / Theme / Export tabs. Autosave to IndexedDB, undo / redo with keystroke grouping, Tiptap-powered rich text for summary and bullets, markdown round-trip on every field. |
-| **Six templates** | Modern Minimal, Classic Serif, Tech Sans, Executive, Compact, Editorial. Each ships with its own typographic system; all six are single-column and pass the in-app ATS check. |
+| **Eleven templates** | Modern Minimal, Classic Serif, Tech Sans, Executive, Compact, Editorial, Geometric, Standard, Broadsheet, Warmth, Refined. Each ships with its own typographic system (and signature default fonts applied on selection); all eleven are single-column and pass the in-app ATS check. |
 | **Live theming** | Heading font, body font, accent color, type scale, line height — all reactive on the live canvas through CSS custom properties. The PDF mirrors the canvas spacing exactly. |
 | **Vector PDF export** | `@react-pdf/renderer` — real text in the content stream with ToUnicode CMaps, embedded fonts, single-column layout. Never image-based, never `html2canvas`. Each exported PDF also embeds an editable source copy, so re-importing it on the dashboard restores your template, fonts, and settings instantly — no re-parse. |
 | **DOCX export** | Plain Calibri 11pt for places that prefer Word; ATS-safe by default. |
@@ -55,7 +55,7 @@ Start blank, or drop a PDF / DOCX / JSON Resume on the import card. Smart parse 
 
 ![Template gallery on the landing page](./docs/screenshots/03-templates.png)
 
-Six templates, every variant designed to pass the ATS check by construction (single column, real text, embedded fonts, no decorative layout).
+Eleven templates, every variant designed to pass the ATS check by construction (single column, real text, embedded fonts, no decorative layout).
 
 ---
 

@@ -32,7 +32,7 @@ const TemplateGallery: FC = () => {
                 letterSpacing: '-0.028em',
               }}
             >
-              <span className="italic font-normal text-accent-ink dark:text-accent">Six</span>{' '}
+              <span className="italic font-normal text-accent-ink dark:text-accent">Eleven</span>{' '}
               places to start.
             </h2>
           </div>

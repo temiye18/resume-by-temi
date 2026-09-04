@@ -2,6 +2,7 @@ export { janeDoe } from './jane-doe';
 export { janeDoeResume } from './jane-doe-resume';
 export { themeOptions } from './theme-options';
 export { templateTiles } from './template-tiles';
+export { templateDefaults } from './template-defaults';
 export { landingPrinciples } from './landing-principles';
 export { editorSidebarTabs, editorSectionSummaries } from './editor-preview-mock';
 export { atsExtractedLines, atsVerifiedItems } from './ats-comparison-content';

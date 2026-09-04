@@ -5,7 +5,7 @@ import { ArrowUpRight01Icon, ArrowLeft01Icon } from '@hugeicons/core-free-icons'
 import SiteHeader from '@/components/SiteHeader/SiteHeader';
 import SiteFooter from '@/components/SiteFooter/SiteFooter';
 import ResumePreview from '@/components/ResumePreview/ResumePreview';
-import { templateTiles } from '@/constants';
+import { templateTiles, templateDefaults } from '@/constants';
 import type { ResumeVariant } from '@/types/resume-variant-type';
 
 const TemplateDetailPage: FC = () => {
@@ -65,7 +65,11 @@ const TemplateDetailPage: FC = () => {
               className="shadow-canvas rounded-canvas overflow-hidden"
               style={{ outline: '1px solid oklch(1 0 0 / 0.04)', outlineOffset: '-1px' }}
             >
-              <ResumePreview variant={variant} />
+              <ResumePreview
+                variant={variant}
+                headingFont={templateDefaults[variant].headingFont}
+                bodyFont={templateDefaults[variant].bodyFont}
+              />
             </div>
           </div>
         </div>

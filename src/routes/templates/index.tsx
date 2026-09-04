@@ -21,7 +21,7 @@ const TemplatesPage: FC = () => {
                   letterSpacing: '-0.028em',
                 }}
               >
-                <span className="italic font-normal text-accent-ink dark:text-accent">Six</span>{' '}
+                <span className="italic font-normal text-accent-ink dark:text-accent">Eleven</span>{' '}
                 templates.
               </h1>
             </div>

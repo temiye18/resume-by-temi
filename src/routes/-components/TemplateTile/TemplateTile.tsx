@@ -2,7 +2,7 @@ import { type FC, useRef } from 'react';
 import { m, useScroll, useTransform, useReducedMotion } from 'motion/react';
 import ResumePreview from '@/components/ResumePreview/ResumePreview';
 import { cn } from '@/lib/cn';
-import { tileNumberVariants, galleryTileVariants, easeOutExpo } from '@/constants';
+import { tileNumberVariants, galleryTileVariants, easeOutExpo, templateDefaults } from '@/constants';
 import type { ResumeVariant } from '@/types/resume-variant-type';
 
 interface ITemplateTileProps {
@@ -82,7 +82,12 @@ const TemplateTile: FC<ITemplateTileProps> = ({ variant, name, caption, index })
               },
             }}
           >
-            <ResumePreview variant={variant} interactive={false} />
+            <ResumePreview
+              variant={variant}
+              interactive={false}
+              headingFont={templateDefaults[variant].headingFont}
+              bodyFont={templateDefaults[variant].bodyFont}
+            />
           </m.div>
         </m.div>
 

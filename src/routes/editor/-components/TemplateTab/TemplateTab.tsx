@@ -11,7 +11,7 @@ const TemplateTab: FC = () => {
     <div className="flex flex-col gap-3 p-4">
       <p className="font-mono text-2xs uppercase tracking-[0.16em] text-muted">Template</p>
       <p className="font-sans text-sm text-ink-soft text-pretty">
-        Switching templates keeps every line you've written. The same JSON, six presentations.
+        Switching templates keeps every line you've written. The same JSON, eleven presentations.
       </p>
       <div className="mt-2 grid grid-cols-1 gap-2">
         {templateTiles.map((tile) => {

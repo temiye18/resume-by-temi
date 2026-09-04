@@ -4,7 +4,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import ResumePreview from '@/components/ResumePreview/ResumePreview';
 import { useIsDesktop } from '@/hooks';
-import { templateTiles } from '@/constants';
+import { templateTiles, templateDefaults } from '@/constants';
 import type { ResumeVariant } from '@/types/resume-variant-type';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -41,7 +41,12 @@ const ShowcaseCard: FC<IShowcaseCardProps> = ({ variant, name, caption }) => (
             transformOrigin: 'center center',
           }}
         >
-          <ResumePreview variant={variant} interactive={false} />
+          <ResumePreview
+            variant={variant}
+            interactive={false}
+            headingFont={templateDefaults[variant].headingFont}
+            bodyFont={templateDefaults[variant].bodyFont}
+          />
         </div>
       </div>
       <div className="mt-5 flex flex-col gap-1.5">

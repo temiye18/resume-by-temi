@@ -3,6 +3,7 @@ import { temporal } from 'zundo';
 import { produce } from 'immer';
 import { emptyResume } from '@/schema/resume';
 import { defaultThemeOverrides } from '@/db/repository';
+import { templateDefaults } from '@/constants';
 import type { IResumeState } from '@/interfaces/i-resume-state';
 
 const baseState = (): Pick<
@@ -39,7 +40,11 @@ export const useResumeStore = create<IResumeState>()(
           resume: produce(state.resume, mutator),
         })),
       setName: (name) => set({ name }),
-      setTemplate: (templateId) => set({ templateId }),
+      setTemplate: (templateId) =>
+        set((state) => ({
+          templateId,
+          theme: { ...state.theme, ...templateDefaults[templateId] },
+        })),
       setTheme: (patch) => set((state) => ({ theme: { ...state.theme, ...patch } })),
       setLastSavedAt: (iso) => set({ lastSavedAt: iso }),
       setSaving: (saving) => set({ isSaving: saving }),

@@ -10,6 +10,11 @@ const TEMPLATES: ResumeVariant[] = [
   'executive',
   'compact',
   'editorial',
+  'geometric',
+  'standard',
+  'broadsheet',
+  'warmth',
+  'refined',
 ];
 
 const normalize = (s: string): string =>

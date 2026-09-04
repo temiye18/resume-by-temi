@@ -31,4 +31,29 @@ export const templateTiles: ITemplateTile[] = [
     name: 'Editorial',
     caption: 'Large two-line name, accent stripe on headings. For creative roles.',
   },
+  {
+    variant: 'geometric',
+    name: 'Geometric',
+    caption: 'Geometric sans, generous air, wide-tracked labels. For product and design.',
+  },
+  {
+    variant: 'standard',
+    name: 'Standard',
+    caption: 'Neutral Swiss grid with full-width rules. For engineering, finance, ops.',
+  },
+  {
+    variant: 'broadsheet',
+    name: 'Broadsheet',
+    caption: 'Modern editorial serif, hairline headings. For writers, comms, academia.',
+  },
+  {
+    variant: 'warmth',
+    name: 'Warmth',
+    caption: 'Humanist and approachable, softer rhythm. For education, health, non-profit.',
+  },
+  {
+    variant: 'refined',
+    name: 'Refined',
+    caption: 'Elegant high-contrast serif, quietly premium. For law and senior roles.',
+  },
 ];

@@ -340,5 +340,173 @@ export const buildTemplateStyle = (
         accentColor: accent,
       };
     }
+    case 'geometric': {
+      const body = theme.bodyFont || 'Manrope';
+      const heading = theme.headingFont || 'Manrope';
+      return {
+        page: { ...composePage(theme), padding: 44 * scale, lineHeight: theme.lineHeight ?? 1.55, fontFamily: body },
+        name: { fontSize: 23 * scale, fontWeight: 700, letterSpacing: -0.3, marginBottom: 5, lineHeight: 1.1, fontFamily: heading },
+        label: { fontSize: 10.5 * scale, color: '#555', marginBottom: 10, lineHeight: 1.25, fontFamily: body },
+        contact: { fontSize: 8.5 * scale, color: '#555', marginBottom: 16, letterSpacing: 0.3, fontFamily: body },
+        sectionHeading: {
+          fontSize: 8 * scale,
+          fontWeight: 700,
+          letterSpacing: 2.2,
+          textTransform: 'uppercase',
+          color: '#6a6a6a',
+          marginTop: 24,
+          marginBottom: 8,
+          fontFamily: heading,
+        },
+        summary: { fontSize: 10 * scale, marginBottom: 4, lineHeight: 1.6, fontFamily: body },
+        entryRow: { marginBottom: 0 },
+        entryHeader: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10, marginBottom: 2 },
+        entryRole: { fontSize: 10.5 * scale, fontWeight: 700, fontFamily: heading },
+        entryCompany: { fontSize: 10 * scale, color: '#444', fontFamily: body },
+        entryDates: { fontSize: 9 * scale, color: '#666', fontFamily: body },
+        bullet: { flexDirection: 'row', marginTop: 3, paddingLeft: 12 },
+        bulletText: { flex: 1, fontSize: 10 * scale, lineHeight: 1.6, fontFamily: body },
+        skillsLine: { flexDirection: 'row', marginBottom: 2 },
+        skillsLabel: { fontSize: 9.5 * scale, fontWeight: 700, fontFamily: heading, marginRight: 4 },
+        skillsText: { flex: 1, fontSize: 9.5 * scale, fontFamily: body },
+        centerHeader: false,
+        accentColor: accent,
+      };
+    }
+    case 'standard': {
+      const body = theme.bodyFont || 'Inter';
+      const heading = theme.headingFont || 'Work Sans';
+      return {
+        page: { ...composePage(theme), fontFamily: body },
+        name: { fontSize: 21 * scale, fontWeight: 700, letterSpacing: -0.1, marginBottom: 3, lineHeight: 1.1, fontFamily: heading },
+        label: { fontSize: 10 * scale, color: '#555', marginBottom: 7, lineHeight: 1.25, fontFamily: body },
+        contact: { fontSize: 8.5 * scale, color: '#555', marginBottom: 14, fontFamily: body },
+        sectionHeading: {
+          fontSize: 9 * scale,
+          fontWeight: 700,
+          letterSpacing: 1.2,
+          textTransform: 'uppercase',
+          marginTop: 18,
+          marginBottom: 7,
+          paddingBottom: 3,
+          borderBottomWidth: 0.5,
+          borderBottomColor: '#999',
+          borderBottomStyle: 'solid',
+          fontFamily: heading,
+        },
+        summary: { fontSize: 10 * scale, marginBottom: 4, lineHeight: 1.5, fontFamily: body },
+        entryRow: { marginBottom: 0 },
+        entryHeader: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 9, marginBottom: 2 },
+        entryRole: { fontSize: 10.5 * scale, fontWeight: 700, fontFamily: heading },
+        entryCompany: { fontSize: 10 * scale, color: '#444', fontFamily: body },
+        entryDates: { fontSize: 9 * scale, color: '#666', fontFamily: body },
+        bullet: { flexDirection: 'row', marginTop: 3, paddingLeft: 12 },
+        bulletText: { flex: 1, fontSize: 10 * scale, lineHeight: 1.5, fontFamily: body },
+        skillsLine: { flexDirection: 'row', marginBottom: 2 },
+        skillsLabel: { fontSize: 9.5 * scale, fontWeight: 700, fontFamily: heading, marginRight: 4 },
+        skillsText: { flex: 1, fontSize: 9.5 * scale, fontFamily: body },
+        centerHeader: false,
+        accentColor: accent,
+      };
+    }
+    case 'broadsheet': {
+      const body = theme.bodyFont || 'PT Serif';
+      const heading = theme.headingFont || 'Newsreader';
+      return {
+        page: { ...composePage(theme), fontFamily: body },
+        name: { fontSize: 25 * scale, fontWeight: 400, letterSpacing: -0.2, marginBottom: 4, lineHeight: 1.1, fontFamily: heading },
+        label: { fontSize: 11 * scale, fontStyle: 'italic', color: '#444', marginBottom: 8, lineHeight: 1.25, fontFamily: heading },
+        contact: { fontSize: 8.5 * scale, color: '#555', marginBottom: 14, fontFamily: body },
+        sectionHeading: {
+          fontSize: 9 * scale,
+          fontWeight: 700,
+          letterSpacing: 1.4,
+          textTransform: 'uppercase',
+          marginTop: 21,
+          marginBottom: 6,
+          paddingBottom: 2,
+          borderBottomWidth: 0.5,
+          borderBottomColor: '#999',
+          borderBottomStyle: 'solid',
+          fontFamily: heading,
+        },
+        summary: { fontSize: 10 * scale, marginBottom: 4, lineHeight: 1.55, fontFamily: body },
+        entryRow: { marginBottom: 0 },
+        entryHeader: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 9, marginBottom: 2 },
+        entryRole: { fontSize: 11 * scale, fontWeight: 700, fontFamily: heading },
+        entryCompany: { fontSize: 10 * scale, fontStyle: 'italic', color: '#444', fontFamily: body },
+        entryDates: { fontSize: 9 * scale, color: '#666', fontFamily: body },
+        bullet: { flexDirection: 'row', marginTop: 3, paddingLeft: 12 },
+        bulletText: { flex: 1, fontSize: 10 * scale, lineHeight: 1.55, fontFamily: body },
+        skillsLine: { flexDirection: 'row', marginBottom: 2 },
+        skillsLabel: { fontSize: 10 * scale, fontWeight: 700, fontFamily: heading, marginRight: 4 },
+        skillsText: { flex: 1, fontSize: 10 * scale, fontFamily: body },
+        centerHeader: false,
+        accentColor: accent,
+      };
+    }
+    case 'warmth': {
+      const body = theme.bodyFont || 'Nunito Sans';
+      const heading = theme.headingFont || 'Nunito Sans';
+      return {
+        page: { ...composePage(theme), lineHeight: theme.lineHeight ?? 1.6, fontSize: 11 * scale, fontFamily: body },
+        name: { fontSize: 22 * scale, fontWeight: 700, letterSpacing: -0.15, marginBottom: 3, lineHeight: 1.1, fontFamily: heading },
+        label: { fontSize: 10.5 * scale, color: '#555', marginBottom: 8, lineHeight: 1.3, fontFamily: body },
+        contact: { fontSize: 9 * scale, color: '#555', marginBottom: 14, fontFamily: body },
+        sectionHeading: {
+          fontSize: 11.5 * scale,
+          fontWeight: 700,
+          letterSpacing: -0.1,
+          marginTop: 20,
+          marginBottom: 6,
+          fontFamily: heading,
+        },
+        summary: { fontSize: 11 * scale, marginBottom: 4, lineHeight: 1.6, fontFamily: body },
+        entryRow: { marginBottom: 0 },
+        entryHeader: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 9, marginBottom: 2 },
+        entryRole: { fontSize: 11 * scale, fontWeight: 700, fontFamily: heading },
+        entryCompany: { fontSize: 10 * scale, color: '#444', fontFamily: body },
+        entryDates: { fontSize: 9 * scale, color: '#666', fontFamily: body },
+        bullet: { flexDirection: 'row', marginTop: 3, paddingLeft: 12 },
+        bulletText: { flex: 1, fontSize: 11 * scale, lineHeight: 1.6, fontFamily: body },
+        skillsLine: { flexDirection: 'row', marginBottom: 2 },
+        skillsLabel: { fontSize: 10 * scale, fontWeight: 700, fontFamily: heading, marginRight: 4 },
+        skillsText: { flex: 1, fontSize: 10 * scale, fontFamily: body },
+        centerHeader: false,
+        accentColor: accent,
+      };
+    }
+    case 'refined': {
+      const body = theme.bodyFont || 'Spectral';
+      const heading = theme.headingFont || 'Spectral';
+      return {
+        page: { ...composePage(theme), padding: 44 * scale, fontFamily: body },
+        name: { fontSize: 26 * scale, fontWeight: 400, letterSpacing: -0.2, marginBottom: 5, lineHeight: 1.1, fontFamily: heading },
+        label: { fontSize: 11 * scale, fontStyle: 'italic', color: '#444', marginBottom: 8, lineHeight: 1.3, fontFamily: heading },
+        contact: { fontSize: 8.5 * scale, color: '#555', marginBottom: 14, letterSpacing: 0.3, fontFamily: body },
+        sectionHeading: {
+          fontSize: 8.5 * scale,
+          fontWeight: 700,
+          letterSpacing: 2.4,
+          textTransform: 'uppercase',
+          marginTop: 24,
+          marginBottom: 8,
+          fontFamily: heading,
+        },
+        summary: { fontSize: 10 * scale, marginBottom: 4, lineHeight: 1.55, fontFamily: body },
+        entryRow: { marginBottom: 0 },
+        entryHeader: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10, marginBottom: 2 },
+        entryRole: { fontSize: 11 * scale, fontWeight: 700, fontFamily: heading },
+        entryCompany: { fontSize: 10 * scale, fontStyle: 'italic', color: '#444', fontFamily: body },
+        entryDates: { fontSize: 9 * scale, color: '#666', fontFamily: body },
+        bullet: { flexDirection: 'row', marginTop: 3, paddingLeft: 12 },
+        bulletText: { flex: 1, fontSize: 10 * scale, lineHeight: 1.55, fontFamily: body },
+        skillsLine: { flexDirection: 'row', marginBottom: 2 },
+        skillsLabel: { fontSize: 10 * scale, fontWeight: 700, fontFamily: heading, marginRight: 4 },
+        skillsText: { flex: 1, fontSize: 10 * scale, fontFamily: body },
+        centerHeader: false,
+        accentColor: accent,
+      };
+    }
   }
 };

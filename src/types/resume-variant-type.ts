@@ -4,4 +4,9 @@ export type ResumeVariant =
   | 'tech-sans'
   | 'executive'
   | 'compact'
-  | 'editorial';
+  | 'editorial'
+  | 'geometric'
+  | 'standard'
+  | 'broadsheet'
+  | 'warmth'
+  | 'refined';
