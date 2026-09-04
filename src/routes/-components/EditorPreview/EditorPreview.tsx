@@ -1,5 +1,5 @@
 import { type FC, useRef, useState } from 'react';
-import { m, useInView, useReducedMotion } from 'motion/react';
+import { m, useInView, useScroll, useTransform, useReducedMotion } from 'motion/react';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { SparklesIcon } from '@hugeicons/core-free-icons';
 import ResumePreview from '@/components/ResumePreview/ResumePreview';
@@ -11,9 +11,18 @@ import {
 
 const EditorPreview: FC = () => {
   const canvasRef = useRef<HTMLDivElement>(null);
+  const deviceRef = useRef<HTMLDivElement>(null);
   const inView = useInView(canvasRef, { once: true, margin: '-15% 0px -15% 0px' });
   const reducedMotion = useReducedMotion();
   const [cursorActive, setCursorActive] = useState(false);
+
+  const { scrollYProgress } = useScroll({
+    target: deviceRef,
+    offset: ['start end', 'center center'],
+  });
+  const deviceScale = useTransform(scrollYProgress, [0, 1], [0.9, 1]);
+  const deviceY = useTransform(scrollYProgress, [0, 1], [80, 0]);
+  const deviceOpacity = useTransform(scrollYProgress, [0, 0.55], [0.3, 1]);
 
   return (
     <section className="px-6 sm:px-10" aria-label="Live editor preview">
@@ -28,7 +37,15 @@ const EditorPreview: FC = () => {
           </p>
         </div>
 
-        <div className="relative overflow-hidden rounded-lg border border-border bg-surface shadow-3">
+        <m.div
+          ref={deviceRef}
+          className="relative overflow-hidden rounded-lg border border-border bg-surface shadow-3 will-change-transform"
+          style={
+            reducedMotion
+              ? undefined
+              : { scale: deviceScale, y: deviceY, opacity: deviceOpacity, transformOrigin: 'center 40%' }
+          }
+        >
           <div className="flex h-12 items-center justify-between border-b border-border bg-surface-sunk px-4">
             <div className="flex items-center gap-3">
               <div className="flex gap-1.5">
@@ -182,7 +199,7 @@ const EditorPreview: FC = () => {
               </div>
             </div>
           </div>
-        </div>
+        </m.div>
       </div>
     </section>
   );

@@ -72,7 +72,8 @@ Six templates, every variant designed to pass the ATS check by construction (sin
 | PDF | `@react-pdf/renderer` | Vector PDFs, embedded fonts |
 | DOCX | `docx` (Dolan Miu) | Plain styled, ATS-friendly |
 | AI (parse / tailor / refine) | Google Gemini (flash tier, with a flash-lite fallback) | Model pinned per feature in each `server/gemini-*.ts` core; routed through a deploy-target-agnostic proxy |
-| Smooth scroll | Lenis | On marketing surfaces only |
+| Smooth scroll | Lenis | On marketing surfaces only; drives GSAP's ticker |
+| 3D / scroll motion | GSAP + ScrollTrigger | Landing only — hero 3D stack, SmartParse 3D panel, pinned ATS scan ritual, pinned template coverflow |
 | Fonts | Fontsource (self-hosted) | 9 catalog fonts for the resume canvas |
 | Schema | Zod | Single source of truth for the `Resume` shape |
 | Hosting | Cloudflare Workers + Static Assets *or* Vercel | Both supported on the same git branch |

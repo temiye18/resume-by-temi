@@ -1,11 +1,7 @@
 import { type FC } from 'react';
 import { m, useReducedMotion } from 'motion/react';
-import TemplateTile from '../TemplateTile/TemplateTile';
-import {
-  templateTiles,
-  galleryTitleVariants,
-  galleryGridVariants,
-} from '@/constants';
+import TemplateShowcase from '../TemplateShowcase/TemplateShowcase';
+import { galleryTitleVariants } from '@/constants';
 
 const VIEWPORT = { once: true, margin: '0px 0px -100px 0px' } as const;
 
@@ -16,10 +12,10 @@ const TemplateGallery: FC = () => {
   return (
     <section
       id="templates"
-      className="border-t border-border/80 px-6 py-28 sm:px-12 sm:py-40"
+      className="border-t border-border/80 py-28 sm:py-36"
       aria-label="Template gallery"
     >
-      <div className="mx-auto max-w-[1280px]">
+      <div className="mx-auto max-w-[1280px] px-6 sm:px-12">
         <m.div
           className="grid gap-12 lg:grid-cols-[1fr_1.6fr] lg:gap-20 lg:items-end"
           initial={initial}
@@ -54,18 +50,10 @@ const TemplateGallery: FC = () => {
             ATS-compliance audit, so the worst-case rendering is still parseable.
           </p>
         </m.div>
+      </div>
 
-        <m.div
-          className="mt-24 grid grid-cols-1 gap-x-12 gap-y-20 sm:grid-cols-2 sm:gap-x-16 sm:gap-y-24"
-          initial={initial}
-          whileInView="visible"
-          viewport={VIEWPORT}
-          variants={galleryGridVariants}
-        >
-          {templateTiles.map((tile, i) => (
-            <TemplateTile key={tile.variant} index={i + 1} {...tile} />
-          ))}
-        </m.div>
+      <div className="mt-16 sm:mt-24">
+        <TemplateShowcase />
       </div>
     </section>
   );

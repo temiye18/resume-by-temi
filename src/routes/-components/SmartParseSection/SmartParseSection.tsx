@@ -1,5 +1,7 @@
-import { type FC, useEffect, useState } from 'react';
+import { type FC, useEffect, useRef, useState } from 'react';
 import { m, useReducedMotion } from 'motion/react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import AiParseShell from '@/components/AiParseLoader/AiParseShell';
 import type { AiParseStage } from '@/types/ai-parse-stage-type';
 import {
@@ -7,6 +9,8 @@ import {
   sectionHeadingRevealVariants,
   sectionBodyRevealVariants,
 } from '@/constants';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const STAGE_CYCLE: { stage: AiParseStage; durationMs: number }[] = [
   { stage: 'uploaded', durationMs: 1400 },
@@ -37,6 +41,28 @@ const SmartParseSection: FC = () => {
       if (timeout) clearTimeout(timeout);
     };
   }, [reducedMotion]);
+
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // GSAP ScrollTrigger scrub is an external animation system; an effect is the correct boundary.
+  useEffect(() => {
+    const panel = panelRef.current;
+    if (!panel) return;
+    const mm = gsap.matchMedia();
+    mm.add('(min-width: 1024px) and (prefers-reduced-motion: no-preference)', () => {
+      gsap.fromTo(
+        panel,
+        { rotationY: 17, y: 64, transformPerspective: 1300, transformOrigin: 'left center' },
+        {
+          rotationY: 0,
+          y: 0,
+          ease: 'none',
+          scrollTrigger: { trigger: panel, start: 'top bottom', end: 'center center', scrub: 1 },
+        },
+      );
+    });
+    return () => mm.revert();
+  }, []);
 
   const stage = STAGE_CYCLE[cycleIndex].stage;
   const initial = reducedMotion ? false : 'hidden';
@@ -128,7 +154,7 @@ const SmartParseSection: FC = () => {
         </div>
 
         <m.div
-          className="relative"
+          className="relative [perspective:1300px]"
           variants={sectionBodyRevealVariants}
           style={{ willChange: 'transform, opacity' }}
         >
@@ -139,26 +165,28 @@ const SmartParseSection: FC = () => {
             }}
             aria-hidden
           />
-          <p className="mb-3 flex items-center justify-between font-mono text-2xs uppercase tracking-[0.24em] text-muted">
-            <span>Live preview</span>
-            <span className="inline-flex items-center gap-1.5 text-ink-soft">
-              <span
-                aria-hidden
-                className="inline-block h-1.5 w-1.5 rounded-pill bg-accent"
-                style={{
-                  boxShadow: reducedMotion
-                    ? undefined
-                    : '0 0 6px var(--color-accent), 0 0 10px var(--color-accent)',
-                }}
-              />
-              looping demo
-            </span>
-          </p>
-          <AiParseShell
-            stage={stage}
-            fileName="your-old-resume.pdf"
-            fileSize={184320}
-          />
+          <div ref={panelRef} className="relative [transform-style:preserve-3d] will-change-transform">
+            <p className="mb-3 flex items-center justify-between font-mono text-2xs uppercase tracking-[0.24em] text-muted">
+              <span>Live preview</span>
+              <span className="inline-flex items-center gap-1.5 text-ink-soft">
+                <span
+                  aria-hidden
+                  className="inline-block h-1.5 w-1.5 rounded-pill bg-accent"
+                  style={{
+                    boxShadow: reducedMotion
+                      ? undefined
+                      : '0 0 6px var(--color-accent), 0 0 10px var(--color-accent)',
+                  }}
+                />
+                looping demo
+              </span>
+            </p>
+            <AiParseShell
+              stage={stage}
+              fileName="your-old-resume.pdf"
+              fileSize={184320}
+            />
+          </div>
         </m.div>
       </div>
     </m.section>

@@ -11,6 +11,6 @@ export const landingPrinciples: IPrinciple[] = [
   },
   {
     title: 'Quiet motion, loaded with meaning.',
-    body: "The page does not perform on load. Buttons do not bounce. The product's motion is reserved for moments that carry real information: autosave completing, the ATS-check ritual finishing, a template change crossfading into place. When motion appears, you notice, because it is rare.",
+    body: "Inside the editor, nothing performs for its own sake. Buttons do not bounce; motion is reserved for moments that carry real information: autosave completing, the ATS-check ritual finishing, a template change crossfading into place. When motion appears where you work, you notice, because it is rare.",
   },
 ];

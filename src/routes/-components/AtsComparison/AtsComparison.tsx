@@ -1,5 +1,7 @@
-import { type FC } from 'react';
+import { type FC, useEffect, useRef } from 'react';
 import { m, useReducedMotion } from 'motion/react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { Tick02Icon, ArrowRight01Icon } from '@hugeicons/core-free-icons';
 import ResumePreview from '@/components/ResumePreview/ResumePreview';
@@ -14,11 +16,49 @@ import {
   atsMedallionVariants,
 } from '@/constants';
 
+gsap.registerPlugin(ScrollTrigger);
+
 const VIEWPORT = { once: true, margin: '0px 0px -120px 0px' } as const;
 
 const AtsComparison: FC = () => {
   const reducedMotion = useReducedMotion();
   const initial = reducedMotion ? false : 'hidden';
+
+  const gridRef = useRef<HTMLDivElement>(null);
+  const scanRef = useRef<HTMLDivElement>(null);
+  const preRef = useRef<HTMLPreElement>(null);
+
+  // GSAP ScrollTrigger pin + scrub is an external animation system; an effect is the correct boundary.
+  useEffect(() => {
+    const grid = gridRef.current;
+    const scan = scanRef.current;
+    const pre = preRef.current;
+    if (!grid || !scan || !pre) return;
+
+    const mm = gsap.matchMedia();
+    mm.add('(min-width: 1024px) and (prefers-reduced-motion: no-preference)', () => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: grid,
+          start: 'center center',
+          end: '+=1000',
+          pin: true,
+          scrub: 1,
+        },
+      });
+      tl.fromTo(scan, { top: '-2%', autoAlpha: 0 }, { autoAlpha: 1, duration: 0.06 }, 0)
+        .fromTo(scan, { top: '-2%' }, { top: '102%', ease: 'none', duration: 1 }, 0)
+        .fromTo(
+          pre,
+          { clipPath: 'inset(0 0 100% 0)' },
+          { clipPath: 'inset(0 0 0% 0)', ease: 'none', duration: 1 },
+          0,
+        )
+        .to(scan, { autoAlpha: 0, duration: 0.06 }, 0.97);
+    });
+
+    return () => mm.revert();
+  }, []);
 
   return (
     <m.section
@@ -63,7 +103,10 @@ const AtsComparison: FC = () => {
           shipping.
         </m.p>
 
-        <div className="mt-20 grid gap-12 lg:grid-cols-[1fr_auto_1fr] lg:items-stretch lg:gap-0">
+        <div
+          ref={gridRef}
+          className="mt-20 grid gap-12 lg:grid-cols-[1fr_auto_1fr] lg:items-stretch lg:gap-0"
+        >
           <m.div
             className="flex flex-col"
             variants={atsColumnLeftVariants}
@@ -77,10 +120,16 @@ const AtsComparison: FC = () => {
             </div>
             <div className="relative bg-bg">
               <div
-                className="mx-auto w-full max-w-[420px] shadow-canvas rounded-canvas overflow-hidden"
+                className="relative mx-auto w-full max-w-[420px] shadow-canvas rounded-canvas overflow-hidden lg:h-[58vh]"
                 style={{ outline: '1px solid oklch(1 0 0 / 0.04)', outlineOffset: '-1px' }}
               >
                 <ResumePreview variant="modern-minimal" />
+                <div
+                  ref={scanRef}
+                  aria-hidden
+                  className="pointer-events-none absolute inset-x-0 z-10 h-[2px] bg-accent opacity-0"
+                  style={{ boxShadow: '0 0 12px 2px var(--color-accent), 0 6px 16px -2px var(--color-accent)' }}
+                />
               </div>
             </div>
           </m.div>
@@ -111,7 +160,10 @@ const AtsComparison: FC = () => {
                 pdftotext extraction
               </p>
             </div>
-            <pre className="flex-1 max-h-[480px] overflow-y-auto whitespace-pre-wrap break-words font-mono text-xs leading-[1.7] text-ink-soft">
+            <pre
+              ref={preRef}
+              className="max-h-[480px] overflow-y-auto whitespace-pre-wrap break-words font-mono text-xs leading-[1.7] text-ink-soft lg:h-[58vh] lg:max-h-none lg:overflow-hidden"
+            >
               {atsExtractedLines.join('\n')}
             </pre>
           </m.div>

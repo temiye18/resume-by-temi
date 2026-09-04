@@ -64,6 +64,17 @@
   --color-info: oklch(0.555 0.105 240);
   --color-info-soft: oklch(0.965 0.03 240);
 
+  /* Résumé paper — constant across themes (the canvas is always paper) */
+  --color-paper: oklch(1 0 0);
+  --color-paper-ink: oklch(0.2 0 0);
+  --color-paper-soft: oklch(0.44 0 0);
+  --color-paper-line: oklch(0.9 0 0);
+  --color-paper-faint: oklch(0.82 0 0);
+  --color-paper-dark: oklch(0.155 0 0);
+  --color-paper-dark-ink: oklch(0.96 0 0);
+  --color-paper-dark-soft: oklch(0.62 0 0);
+  --color-paper-dark-line: oklch(0.32 0 0);
+
   --font-display: 'Vollkorn Variable', 'Vollkorn', Georgia, 'Times New Roman', serif;
   --font-sans:
     'Bricolage Grotesque Variable', 'Bricolage Grotesque', -apple-system, BlinkMacSystemFont,

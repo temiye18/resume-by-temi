@@ -1,5 +1,5 @@
-import { type FC } from 'react';
-import { m } from 'motion/react';
+import { type FC, useRef } from 'react';
+import { m, useScroll, useTransform, useReducedMotion } from 'motion/react';
 import ResumePreview from '@/components/ResumePreview/ResumePreview';
 import { cn } from '@/lib/cn';
 import { tileNumberVariants, galleryTileVariants, easeOutExpo } from '@/constants';
@@ -13,11 +13,19 @@ interface ITemplateTileProps {
 }
 
 const TemplateTile: FC<ITemplateTileProps> = ({ variant, name, caption, index }) => {
+  const reduce = useReducedMotion() ?? false;
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  const depth = index % 2 === 0 ? 54 : 30;
+  const parallaxY = useTransform(scrollYProgress, [0, 1], [depth, -depth]);
+
   return (
     <m.div
+      ref={ref}
       variants={galleryTileVariants}
       style={{ willChange: 'transform, opacity' }}
     >
+      <m.div style={reduce ? undefined : { y: parallaxY }}>
       <m.a
         href={`/templates/${variant}`}
         className="group block focus-visible:outline-none"
@@ -102,6 +110,7 @@ const TemplateTile: FC<ITemplateTileProps> = ({ variant, name, caption, index })
           </p>
         </div>
       </m.a>
+      </m.div>
     </m.div>
   );
 };

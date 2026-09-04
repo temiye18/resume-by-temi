@@ -1,6 +1,10 @@
 import { useEffect } from 'react';
 import Lenis from 'lenis';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useRouterState } from '@tanstack/react-router';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const DISABLED_ROUTE_PATTERNS = [/^\/editor(\/|$)/];
 
@@ -30,15 +34,15 @@ export const useSmoothScroll = (): void => {
       },
     });
 
-    let frame = 0;
-    const tick = (time: number) => {
-      lenis.raf(time);
-      frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
+    // Lenis drives the scroll; ScrollTrigger reads from it and shares GSAP's ticker.
+    lenis.on('scroll', ScrollTrigger.update);
+    const onTick = (time: number) => lenis.raf(time * 1000);
+    gsap.ticker.add(onTick);
+    gsap.ticker.lagSmoothing(0);
 
     return () => {
-      cancelAnimationFrame(frame);
+      gsap.ticker.remove(onTick);
+      lenis.off('scroll', ScrollTrigger.update);
       lenis.destroy();
     };
   }, [pathname]);
